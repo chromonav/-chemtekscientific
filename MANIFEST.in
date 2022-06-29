@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include chemtech_custom_app *.css
+recursive-include chemtech_custom_app *.csv
+recursive-include chemtech_custom_app *.html
+recursive-include chemtech_custom_app *.ico
+recursive-include chemtech_custom_app *.js
+recursive-include chemtech_custom_app *.json
+recursive-include chemtech_custom_app *.md
+recursive-include chemtech_custom_app *.png
+recursive-include chemtech_custom_app *.py
+recursive-include chemtech_custom_app *.svg
+recursive-include chemtech_custom_app *.txt
+recursive-exclude chemtech_custom_app *.pyc
