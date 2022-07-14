@@ -60,7 +60,7 @@ def get_data(filters):
 
 
 	data1 = frappe.db.sql("""SELECT name, company from `tabPurchase Order` where name in {0} and company = '{1}' """.format(tuple(li), filters.get('company')), as_dict = 1, debug = 1)
-	print("$$$$$$$$$$$$$$$$", data1)
+	#print("$$$$$$$$$$$$$$$$", data1)
 
 	for row in data:
 		for row1 in data1:
