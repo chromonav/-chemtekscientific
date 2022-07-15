@@ -51,16 +51,16 @@ def get_data(filters):
     WHERE posting_date BETWEEN '{0}' and '{1}' and si.company = '{2}' """.format(filters.get('from_date'), filters.get('to_date'),filters.get('company')),as_dict=1,debug=1)
 	
 	purchase_order_name = [item.purchase_order for item in data]
-	#print("))))))))))))))))", purchase_order_name)
+	
 	li =[]
 	for i in purchase_order_name:
 		if i!= None:
 			li.append(i)
-	#print("#####",li)
+	
 
 
 	data1 = frappe.db.sql("""SELECT name, company from `tabPurchase Order` where name in {0} and company = '{1}' """.format(tuple(li), filters.get('company')), as_dict = 1, debug = 1)
-	#print("$$$$$$$$$$$$$$$$", data1)
+	
 
 	for row in data:
 		for row1 in data1:
@@ -69,7 +69,7 @@ def get_data(filters):
 				row.update(({row.get('purchase_order'):row.get('name')}))
 			else:
 				row.update(({row.get('purchase_order'):'None'}))
-	print("%%%",data)
+	
 	return data
 
 	

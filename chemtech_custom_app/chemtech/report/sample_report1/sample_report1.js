@@ -8,7 +8,7 @@ frappe.query_reports["Sample_report1"] = {
 			"fieldname": "company",
 			"label": __("Company"),
 			"fieldtype": "Link",
-			"width": "80",
+			"width": "100",
 			"options": "Company",
 			"reqd": 1,
 			"default": frappe.defaults.get_default("company")
