@@ -38,39 +38,28 @@ def validate_filters(filters):
 
 
 def get_data(filters):
-	#print("*************	",filters)
+	
+    data = frappe.db.sql(""" SELECT si.name as sales_invoice_name,si.company,si.posting_date,si.customer_name,ad.city as location,sii.item_code as item_code,sii.batch_no as batch_id,sii.item_name,sii.rate as si_rate,sii.qty as si_qty,sii.lot_number as lot_no,sii.taxable_value 
+         as si_taxable_value,si.total_taxes_and_charges as si_gst_tax_amount FROM `tabSales Invoice` si JOIN `tabSales Invoice Item` sii on sii.parent = si.name JOIN `tabAddress` ad ON si.customer_address = 
+         ad.name WHERE posting_date BETWEEN '{0}' and '{1}' and si.company = '{2}' and si.status not in ('Return','Cancelled')GROUP BY 
+         sii.item_code ORDER BY si.posting_date """.format(filters.get('from_date'), filters.get('to_date'),filters.get('company')),as_dict=1,debug=1)
+    item_code_list = [item.item_code for item in data]
+    
+    data1=frappe.db.sql("""SELECT po.transaction_date,pii.item_code as pi_item_code, pii.item_name, pii.rate as pi_rate, pii.qty as pii_qty, pii.taxable_value as po_taxable_value,pii.purchase_order, po.name as po_name, po.company ,po.total_taxes_and_charges as po_gst_tax_amount from `tabPurchase Invoice Item` pii join `tabPurchase Order` po on po.name = pii.purchase_order JOIN `tabSales Invoice` si ON po.transaction_date=si.posting_date where po.company = '{0}' and pii.item_code in {1} and po.company = '{4}' and po.transaction_date <=si.posting_date """.format(filters.get('company'),tuple(item_code_list),filters.get('from_date'), filters.get('to_date'),filters.get('company')),as_dict=1,debug=1)
+    
+    for row in data:
+        for row1 in data1:
+            if row.get('item_code') == row1.get('pi_item_code') and row.get('company') == row1.get('company'):
+                row1.update({'balance_qty':(row.get('si_qty')-row1.get('pii_qty'))})
+                row1.update({'gross_profit':(flt(row.get('si_rate'))-flt(row.get('pi_rate')))})
+                row.update(row1)
+            elif row.get('item_code') == row1.get('pi_item_code'):
+                row1.update({'balance_qty':(row.get('si_qty')-row1.get('pii_qty'))})
+                row1.update({'gross_profit':(flt(row.get('si_rate'))-flt(row.get('pi_rate')))})
+                row.update(row1)
 
-	data = frappe.db.sql(""" SELECT si.name as sales_invoice_name,si.company,
-	si.posting_date,si.customer_name,sii.item_code,sii.batch_no as batch_id,
-    sii.item_name,sii.rate as si_rate,sii.qty as si_qty,pii.parent as parent,
-	pii.purchase_order as purchase_order,pii.qty as pii_qty,pii.rate as pii_rate,((sii.rate)-(pii.rate)) as gross_profit 
-    FROM `tabSales Invoice` si 
-	JOIN `tabSales Invoice Item` sii on sii.parent = si.name 
-    JOIN `tabPurchase Invoice Item` pii
-    ON pii.batch_no = sii.batch_no and pii.item_code = sii.item_code 
-    WHERE posting_date BETWEEN '{0}' and '{1}' and si.company = '{2}' """.format(filters.get('from_date'), filters.get('to_date'),filters.get('company')),as_dict=1,debug=1)
-	
-	purchase_order_name = [item.purchase_order for item in data]
-	
-	li =[]
-	for i in purchase_order_name:
-		if i!= None:
-			li.append(i)
-	
-
-
-	data1 = frappe.db.sql("""SELECT name, company from `tabPurchase Order` where name in {0} and company = '{1}' """.format(tuple(li), filters.get('company')), as_dict = 1, debug = 1)
-	
-
-	for row in data:
-		for row1 in data1:
-			if row.get('purchase_order')==row1.get('name'):
-				print("^^^^^^",row.get('purchase_order'),row1.get('name'))
-				row.update(({row.get('purchase_order'):row.get('name')}))
-			else:
-				row.update(({row.get('purchase_order'):'None'}))
-	
-	return data
+   
+    return data
 
 	
 	
@@ -103,6 +92,12 @@ def get_columns(filters):
             "width": 80,
         },
         {
+            "label": _("Customer Location"),
+            "fieldname": "location",
+            "fieldtype": "Data",
+            "width": 80,
+        },
+        {
             "label": _("Item Code"),
             "fieldname": "item_code",
             "fieldtype": "Data",
@@ -116,6 +111,12 @@ def get_columns(filters):
             "width": 80,
         },
         {
+            "label": _("Lot_No"),
+            "fieldname": "lot_no",
+            "fieldtype": "Data",
+            "width": 80,
+        },
+        {
             "label": _("Item Name"),
             "fieldname": "item_name",
             "fieldtype": "Data",
@@ -124,19 +125,17 @@ def get_columns(filters):
         {
             "label": _("Selling Rate"),
             "fieldname": "si_rate",
-            "fieldtype": "Currenc",
+            "fieldtype": "Currency",
             "options": "Company:company:default_currency",
             "convertible": "rate",
             "width": 80,
         },
-        
         {
             "label": _("Sell Qt"),
             "fieldname": "si_qty",
             "fieldtype": "Data",
             "width": 50,
         },
-        
         {
             "label": _("Purchase Qty"),
             "fieldname": "pii_qty",
@@ -144,8 +143,54 @@ def get_columns(filters):
             "width": 50,
         },
         {
+            "label": _("Balance Qty"),
+            "fieldname": "balance_qty",
+            "fieldtype": "Data",
+            "width": 50,
+        },
+        {
+            "label": _("Sales Taxable Value"),
+            "fieldname": "si_taxable_value",
+            "fieldtype": "Currency",
+            "options": "Company:company:default_currency",
+            "convertible": "rate",
+            "width": 80,
+        },
+        
+         {
+            "label": _("Sales GST Tax Amount"),
+            "fieldname": "si_gst_tax_amount",
+            "fieldtype": "Currency",
+            "options": "Company:company:default_currency",
+            "convertible": "rate",
+            "width": 80,
+        },
+        {
+            "label": _("Purchase Order"),
+            "fieldname": "purchase_order",
+            "fieldtype": "Data",
+            "width": 80,
+        },     
+        {
+            "label": _("Purchase Taxable Value"),
+            "fieldname": "po_taxable_value",
+            "fieldtype": "Currency",
+            "options": "Company:company:default_currency",
+            "convertible": "rate",
+            "width": 80,
+        },
+        {
+            "label": _("Purchase GST Tax Amount"),
+            "fieldname": "po_gst_tax_amount",
+            "fieldtype": "Currency",
+            "options": "Company:company:default_currency",
+            "convertible": "rate",
+            "width": 80,
+        },
+        
+        {
             "label": _("Purchase Rate"),
-            "fieldname": "pii_rate",
+            "fieldname": "pi_rate",
             "fieldtype": "Currency",
             "width": 80,
         },
@@ -155,12 +200,7 @@ def get_columns(filters):
             "fieldtype": "Currency",
             "width": 80,
         },
-		{
-            "label": _("Purchase Order"),
-            "fieldname": "purchase_order",
-            "fieldtype": "Data",
-            "width": 80,
-        }
+		
 		
 		
 
