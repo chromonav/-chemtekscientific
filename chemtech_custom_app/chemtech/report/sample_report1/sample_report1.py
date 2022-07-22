@@ -54,7 +54,7 @@ def get_data(filters):
                 row1.update({'gross_profit':(flt(row.get('si_rate'))-flt(row.get('pi_rate')))})
                 row.update(row1)
             elif row.get('item_code') == row1.get('pi_item_code'):
-                row1.update({'balance_qty':abs(row.get('si_qty')-abs(row1.get('pii_qty'))))})
+                row1.update({'balance_qty':abs((row.get('si_qty')-abs(row1.get('pii_qty'))))})
                 row1.update({'gross_profit':(flt(row.get('si_rate'))-flt(row.get('pi_rate')))})
                 row.update(row1)
 
