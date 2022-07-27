@@ -4,44 +4,79 @@ import frappe
 from frappe import _
 
 def execute(filters=None):
-	if not filters:
-		return [], [], None, []
-
 	columns = get_columns(filters)
 	data = get_data(filters)
 	return columns, data, None
 
 def get_data(filters):
-	print("**",filters)
-	data = frappe.db.sql("""SELECT co.name as acc_name,co.address as location,co.status as contact_status,co.designation as designation,
-		co.department as department,co.mobile_no as mobile_no,co.phone as phone,co.email_id as email_id,cu.sales_person as sales_person_name,
-		co.area_of_interest_1 as area_of_interest_1,co.area_of_interest_2 as area_of_interest_2,co.hplc as hplc,
-		co.uplc as uplc,co.gchs as gchs,co.gcms as gcms,
-		co.lcms as lcms,co.icp_ as icp,	co.kfr as kfr,co.ic as ic,co.ph_ as ph,co.icpms as icpms,co.ftir_ as ftir,
-		co.dissolution as dissolution,co.malvern as malvern
-		FROM `tabContact` co, `tabCustomer` cu
-	 	WHERE co.company_name=cu.customer_name""".format(filters.get('customer_name'), filters.get('status')),as_dict=1,debug=1)
-	print("IIIIIIIIIIIIIIIIIIIIIIIIIII", data)
-	return data
+    if filters:
+        print("++++",filters)
+        data = frappe.db.sql(""" SELECT cu.sales_person as sales_person_name, cu.customer_name as customer_name,
+            co.address as full_addess,CONCAT(co.first_name,co.last_name) as contact_person,co.creation as creation_date,
+            co.status as contact_status,co.designation as designation,co.department as department,co.mobile_no as mobile_no,
+            co.phone as landline,co.email_id as email_id,co.area_of_interest_1 as area_of_interest_1,
+            co.area_of_interest_2 as area_of_interest_2,co.hplc as hplc,co.uplc as uplc,co.gchs as gchs,co.gcms as gcms,co.lcms as lcms,
+            co.icp_ as icp,co._kfr as kfr,co.ic as ic,co.ph_ as ph,co.icpms as icpms,co.ftir_ as ftir,co.dissolution as dissolution,co.malvern as malvern
+            FROM `tabCustomer` cu JOIN `tabContact`co ON cu.customer_name=co.company_name 
+            WHERE co.first_name ='{0}' OR co.status='{1}' """.format(filters.get('first_name'),filters.get('status'),as_dict=1,debug=1))
+        return data
+    # elif filters:
+    #     print("======= in elif",filters)
+    #     data = frappe.db.sql(""" SELECT cu.sales_person as sales_person_name, cu.customer_name as customer_name,co.address as full_addess,CONCAT(co.first_name,co.last_name) as contact_person,co.creation as creation_date,co.status as contact_status,co.designation as designation FROM `tabCustomer` cu JOIN `tabContact`co ON cu.customer_name=co.company_name WHERE cu.sales_person ='{0}' OR co.status='{1}' """.format(filters.get('sales_person'),filters.get('status'),as_dict=1,debug=1))
+    #     return data
+    else:
+        print("---------------in else")
+        data = frappe.db.sql("""SELECT cu.sales_person as sales_person_name,CONCAT(co.first_name,co.last_name) as contact_person,
+            co.company_name as customer_name,co.address as full_address,co.creation as creation_date,co.status as contact_status,
+            co.designation as designation,co.department as department,co.mobile_no as mobile_no,
+            co.phone as landline,co.email_id as email_id,co.area_of_interest_1 as area_of_interest_1,
+            co.area_of_interest_2 as area_of_interest_2,co.hplc as hplc,co.uplc as uplc,co.gchs as gchs,co.gcms as gcms,co.lcms as lcms,
+            co.icp_ as icp,co._kfr as kfr,co.ic as ic,co.ph_ as ph,co.icpms as icpms,co.ftir_ as ftir,co.dissolution as dissolution,co.malvern as malvern
+            FROM `tabContact` co JOIN `tabCustomer` cu ON co.company_name=cu.customer_name""",as_dict=1,debug=1)
+        return data
 
 def get_columns(filters):
 	columns = [
-		{
+		
+        {
             "label": _("Sales Person"),
             "fieldname": "sales_person_name",
             "fieldtype": "Data",
             "width": 80,
         },
         {
-            "label": _("Account Name"),
-            "fieldname": "acc_name",
+            "label": _("Customer Name"),
+            "fieldname": "customer_name",
             "fieldtype": "Data",
             "width": 80,
         },
         
         {
-            "label": _("Location"),
-            "fieldname": "location",
+            "label": _("Address"),
+            "fieldname": "full_address",
+            "fieldtype": "Data",
+            "width": 80,
+        },
+        # {
+        #     "label": _("City"),
+        #     "fieldname": "ad_city",
+        #     "fieldtype": "Data",
+        #     "width": 80,
+        # },{
+        #     "label": _("State"),
+        #     "fieldname": "ad_state",
+        #     "fieldtype": "Data",
+        #     "width": 80,
+        # },
+        {
+            "label": _("Contact Person"),
+            "fieldname": "contact_person",
+            "fieldtype": "Data",
+            "width": 80,
+        },
+        {
+            "label": _("Creation Date"),
+            "fieldname": "creation_date",
             "fieldtype": "Data",
             "width": 80,
         },
@@ -53,10 +88,10 @@ def get_columns(filters):
             "width": 80,
         },
         {
-            "label": _("Designation"),
-            "fieldname": "designation",
-            "fieldtype": "Data",
-            "width": 80,
+           "label": _("Designation"),
+           "fieldname": "designation",
+           "fieldtype": "Data",
+           "width": 80,
         },
         {
             "label": _("Department"),
@@ -72,7 +107,7 @@ def get_columns(filters):
         },
         {
             "label": _("Landline no."),
-            "fieldname": "phone",
+            "fieldname": "landline",
             "fieldtype": "Data",
             "width": 80,
         },
