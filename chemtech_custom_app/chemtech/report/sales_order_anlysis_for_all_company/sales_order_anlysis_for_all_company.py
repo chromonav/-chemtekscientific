@@ -59,7 +59,6 @@ def get_conditions(filters):
 def get_data(conditions, filters):
 	# nosemgrep
 	if filters and conditions:
-		print("++++++in if")
 		data = frappe.db.sql(
 			"""
 			SELECT
@@ -95,7 +94,6 @@ def get_data(conditions, filters):
 
 		return data
 	else:
-		print("**************************", filters.get('from_date'), filters.get('to_date'), filters.get('status'), filters.get('sales_order'))
 		# nosemgrep
 		company_list = ['Chemtek Scientific Private Limited-Hyd','Chemtek Scientific Private Limited','Chemtek Scientific Private Limited-Bangalore','Chemtek Scientific Private Limited- Vapi',
 			'Chemtek Scientific Company','Lab-Quest International','Labserve  International']
