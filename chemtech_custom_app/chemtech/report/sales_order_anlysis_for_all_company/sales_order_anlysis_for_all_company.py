@@ -58,45 +58,81 @@ def get_conditions(filters):
 
 def get_data(conditions, filters):
 	# nosemgrep
-	data = frappe.db.sql(
-		"""
-		SELECT
-			so.transaction_date as date,
-			soi.delivery_date as delivery_date,
-			so.name as sales_order,
-			so.status, so.customer, soi.item_code,
-			DATEDIFF(CURDATE(), soi.delivery_date) as delay_days,
-			IF(so.status in ('Completed','To Bill'), 0, (SELECT delay_days)) as delay,
-			soi.qty, soi.delivered_qty,
-			(soi.qty - soi.delivered_qty) AS pending_qty,
-			IFNULL(SUM(sii.qty), 0) as billed_qty,
-			soi.base_amount as amount,
-			(soi.delivered_qty * soi.base_rate) as delivered_qty_amount,
-			(soi.billed_amt * IFNULL(so.conversion_rate, 1)) as billed_amount,
-			(soi.base_amount - (soi.billed_amt * IFNULL(so.conversion_rate, 1))) as pending_amount,
-			soi.warehouse as warehouse,
-			so.company, soi.name,
-			soi.description as description
-		FROM
-			`tabSales Order` so,
-			`tabSales Order Item` soi
-		LEFT JOIN `tabSales Invoice Item` sii
-			ON sii.so_detail = soi.name and sii.docstatus = 1
-		WHERE
-			soi.parent = so.name
-			and so.status not in ('Stopped', 'Closed', 'On Hold')
-			and so.docstatus = 1
-			{conditions}
-		GROUP BY soi.name
-		ORDER BY so.transaction_date ASC, soi.item_code ASC
-	""".format(
-			conditions=conditions
-		),
-		filters,
-		as_dict=1,
-	)
+	if filters and conditions:
+		print("++++++in if")
+		data = frappe.db.sql(
+			"""
+			SELECT
+				so.transaction_date as date,
+				soi.delivery_date as delivery_date,
+				so.name as sales_order,
+				so.status, so.customer, soi.item_code,
+				DATEDIFF(CURDATE(), soi.delivery_date) as delay_days,
+				IF(so.status in ('Completed','To Bill'), 0, (SELECT delay_days)) as delay,
+				soi.qty, soi.delivered_qty,
+				(soi.qty - soi.delivered_qty) AS pending_qty,
+				IFNULL(SUM(sii.qty), 0) as billed_qty,
+				soi.base_amount as amount,
+				(soi.delivered_qty * soi.base_rate) as delivered_qty_amount,
+				(soi.billed_amt * IFNULL(so.conversion_rate, 1)) as billed_amount,
+				(soi.base_amount - (soi.billed_amt * IFNULL(so.conversion_rate, 1))) as pending_amount,
+				soi.warehouse as warehouse,
+				so.company, soi.name,
+				soi.description as description
+			FROM
+				`tabSales Order` so,
+				`tabSales Order Item` soi
+			LEFT JOIN `tabSales Invoice Item` sii
+				ON sii.so_detail = soi.name and sii.docstatus = 1
+			WHERE
+				soi.parent = so.name
+				and so.status not in ('Stopped', 'Closed', 'On Hold')
+				and so.docstatus = 1
+				{conditions}
+			GROUP BY soi.name
+			ORDER BY so.transaction_date ASC, soi.item_code ASC
+		""".format(conditions=conditions),filters,as_dict=1,debug=1)
 
-	return data
+		return data
+	else:
+		print("**************************", filters.get('from_date'), filters.get('to_date'), filters.get('status'), filters.get('sales_order'))
+		# nosemgrep
+		company_list = ['Chemtek Scientific Private Limited-Hyd','Chemtek Scientific Private Limited','Chemtek Scientific Private Limited-Bangalore','Chemtek Scientific Private Limited- Vapi',
+			'Chemtek Scientific Company','Lab-Quest International','Labserve  International']
+
+		data = frappe.db.sql(
+			"""
+			SELECT
+				so.transaction_date as date,
+				soi.delivery_date as delivery_date,
+				so.name as sales_order,
+				so.status, so.customer, soi.item_code,
+				DATEDIFF(CURDATE(), soi.delivery_date) as delay_days,
+				IF(so.status in ('Completed','To Bill'), 0, (SELECT delay_days)) as delay,
+				soi.qty, soi.delivered_qty,
+				(soi.qty - soi.delivered_qty) AS pending_qty,
+				IFNULL(SUM(sii.qty), 0) as billed_qty,
+				soi.base_amount as amount,
+				(soi.delivered_qty * soi.base_rate) as delivered_qty_amount,
+				(soi.billed_amt * IFNULL(so.conversion_rate, 1)) as billed_amount,
+				(soi.base_amount - (soi.billed_amt * IFNULL(so.conversion_rate, 1))) as pending_amount,
+				soi.warehouse as warehouse,
+				so.company, soi.name,
+				soi.description as description
+			FROM
+				`tabSales Order` so,
+				`tabSales Order Item` soi
+			LEFT JOIN `tabSales Invoice Item` sii
+				ON sii.so_detail = soi.name and sii.docstatus = 1
+			WHERE
+				soi.parent = so.name
+				and so.status not in ('Stopped', 'Closed', 'On Hold')
+				and so.docstatus = 1 and so.company in {0}
+			GROUP BY soi.name
+			ORDER BY so.transaction_date ASC, soi.item_code ASC
+		""".format(tuple(company_list)),as_dict=1,debug = 1)
+
+		return data
 
 
 def get_so_elapsed_time(data):
