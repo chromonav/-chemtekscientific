@@ -15,14 +15,14 @@ frappe.query_reports["Sales Order Anlysis For All Company"] = {
 			'Labserve International'],
 			"reqd": 0
 			
-		},*/
+		},
 
 			"options": ['Chemtek Scientific Pvt. Ltd Mumbai','Chemtek Scientific Pvt. Ltd Vapi','Chemtek Scientific Pvt. Ltd Bangalore',
 			'Chemtek Scientific Pvt. Ltd Hyderabad','Lab-Quest International','Chemtek Scientific Company',
 			'LSI – Labserve International'],
 			"reqd": 0
 			
-		},
+		},*/
 
 		{
 			"fieldname":"from_date",
