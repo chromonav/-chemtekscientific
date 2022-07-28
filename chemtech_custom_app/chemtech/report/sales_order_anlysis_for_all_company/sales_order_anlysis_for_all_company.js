@@ -3,7 +3,8 @@
 /* eslint-disable */
 
 frappe.query_reports["Sales Order Anlysis For All Company"] = {
-	{
+	"filters": [
+		{
 			"fieldname":"from_date",
 			"label": __("From Date"),
 			"fieldtype": "Date",
