@@ -3,28 +3,7 @@
 /* eslint-disable */
 
 frappe.query_reports["Sales Order Anlysis For All Company"] = {
-	"filters": [
-		/*{
-			"fieldname": "company",
-			"label": __("Company"),
-			"fieldtype": "Select",
-			"width": "80",
-
-			"options": ['Chemtek Scientific Pvt. Ltd','Chemtek Scientific Pvt. Ltd Vapi','Chemtek Scientific Pvt. Ltd Bangalore',
-			'Chemtek Scientific Pvt. Ltd Hyderabad','Lab-Quest International','Chemtek Scientific Company',
-			'Labserve International'],
-			"reqd": 0
-			
-		},
-
-			"options": ['Chemtek Scientific Pvt. Ltd Mumbai','Chemtek Scientific Pvt. Ltd Vapi','Chemtek Scientific Pvt. Ltd Bangalore',
-			'Chemtek Scientific Pvt. Ltd Hyderabad','Lab-Quest International','Chemtek Scientific Company',
-			'LSI – Labserve International'],
-			"reqd": 0
-			
-		},*/
-
-		{
+	{
 			"fieldname":"from_date",
 			"label": __("From Date"),
 			"fieldtype": "Date",
