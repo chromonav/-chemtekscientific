@@ -59,6 +59,7 @@ def get_conditions(filters):
 def get_data(conditions, filters):
 	# nosemgrep
 	if filters and conditions:
+		company_list = ['Chemtek Scientific Private Limited-Hyd','Chemtek Scientific Private Limited','Chemtek Scientific Private Limited-Bangalore','Chemtek Scientific Private Limited- Vapi','Chemtek Scientific Company','Lab-Quest International','Labserve  International']
 		data = frappe.db.sql(
 			"""
 			SELECT
@@ -86,11 +87,11 @@ def get_data(conditions, filters):
 			WHERE
 				soi.parent = so.name
 				and so.status not in ('Stopped', 'Closed', 'On Hold')
-				and so.docstatus = 1
+				and so.docstatus = 1 and so.company in {0}
 				{conditions}
 			GROUP BY soi.name
 			ORDER BY so.transaction_date ASC, soi.item_code ASC
-		""".format(conditions=conditions),filters,as_dict=1,debug=1)
+		""".format(tuple(company_list),conditions=conditions),filters,as_dict=1,debug=1)
 
 		return data
 	else:
