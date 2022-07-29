@@ -6,19 +6,10 @@ frappe.query_reports["Contact Person Report With Detail"] = {
 	"filters": [
 		
 		{
-				"fieldname":"customer_name",
-				"label": __("Customer Name"),
-				"fieldtype": "Link",
-				"options":'Customer',
-				"width": "80",
-				"reqd": 0,
-				
-		},
-		{
-				"fieldname":"sales_person_name",
-				"label": __("Sales Person Name"),
-				"fieldtype": "Link",
-				"options":'Sales Person',
+				"fieldname":"first_name",
+				"label": __("Contact Person Name"),
+				"fieldtype": "Data",
+				"options":'Contact',
 				"width": "80",
 				"reqd": 0,
 				
@@ -27,10 +18,20 @@ frappe.query_reports["Contact Person Report With Detail"] = {
 				"fieldname":"status",
 				"label": __("Status"),
 				"fieldtype": "Select",
-				"options": "Passive\nOpen\nReplied",
+				"options": ['','Passive','Open','Replied'],
 				"width": "80",
 				"reqd": 0,
 				
 		}
+		/*{
+				"fieldname":"sales_person",
+				"label": __("Sales Person Name"),
+				"fieldtype": "Link",
+				"options":'Sales Person',
+				"width": "80",
+				"reqd": 0,
+				
+		},*/
+		
 	]
 };
