@@ -44,7 +44,7 @@ def get_data(filters):
         si.total_taxes_and_charges as si_gst_tax_amount,(si.total_taxes_and_charges+sii.taxable_value) as si_total_value 
         FROM `tabSales Invoice` si JOIN `tabSales Invoice Item` sii on sii.parent = si.name JOIN `tabAddress` ad ON si.customer_address = 
          ad.name WHERE posting_date BETWEEN '{0}' and '{1}' and si.company = '{2}' and si.status not in ('Return','Cancelled')GROUP BY 
-         sii.item_code ORDER BY si.posting_date,MONTH(si.posting_date)""".format(filters.get('from_date'), filters.get('to_date'),filters.get('company')),as_dict=1,debug=1)
+         sii.item_code ORDER BY si.posting_date""".format(filters.get('from_date'), filters.get('to_date'),filters.get('company')),as_dict=1,debug=1)
     item_code_list = [item.item_code for item in data]
     
     data1=frappe.db.sql("""SELECT po.transaction_date,pii.item_code as pi_item_code, pii.item_name, pii.rate as pi_rate,
