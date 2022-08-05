@@ -21,7 +21,7 @@ def get_data(filters):
 
         address_list = [adrs.contact_address for adrs in data]
         
-        data1 = frappe.db.sql("""SELECT name,city as ad_city,CONCAT_WS(' ' , address_line1,address_line2)as full_address,state as ad_state FROM tabAddress""",as_dict=1,debug=1)
+        data1 = frappe.db.sql("""SELECT name,city as ad_city,CONCAT_WS(' ' , address_line1,address_line2,city,state,gst_state_number,pincode,country)as full_address,state as ad_state FROM tabAddress""",as_dict=1,debug=1)
         add_list = []
         for i in address_list:
             if i != None:
