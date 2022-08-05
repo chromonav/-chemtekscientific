@@ -26,7 +26,7 @@ def get_data(filters):
         for i in address_list:
             if i != None:
                 add_list.append(i)
-        
+
         for row in data:
             for row1 in data1:
                 if row.get('contact_address') == row1.get('name'):
@@ -34,7 +34,6 @@ def get_data(filters):
         
         return data
     else:
-        print("========in else=========")
         data =frappe.db.sql(""" SELECT DISTINCT cu.sales_person as sales_person_name,cu.customer_name as customer_name,co.address as contact_address,
             CONCAT_WS(' ' ,co.first_name,co.last_name) as contact_person,co.creation as creation_date,co.status as contact_status,co.designation as designation,co.department as department,
             co.mobile_no as mobile_no,co.phone as landline,co.email_id as email_id,co.area_of_interest_1 as area_of_interest_1,
@@ -44,6 +43,7 @@ def get_data(filters):
         address_list = [adrs.contact_address for adrs in data]
         
         data1 = frappe.db.sql("""SELECT name,city as ad_city,CONCAT_WS(' ' , address_line1,address_line2,city,state,gst_state_number,pincode,country)as full_address,state as ad_state FROM tabAddress""",as_dict=1,debug=1)
+
         add_list = []
         for i in address_list:
             if i != None:
@@ -144,12 +144,6 @@ def get_columns(filters):
             "fieldtype": "Data",
             "width": 80,
         },	
-        # {
-        #     "label": _("Area of Interest 1"),
-        #     "fieldname": "area_of_interest_1",
-        #     "fieldtype": "Data",
-        #     "width": 80,
-        # },
         {
             "label": _("Area of Interest 2"),
             "fieldname": "area_of_interest_2",
