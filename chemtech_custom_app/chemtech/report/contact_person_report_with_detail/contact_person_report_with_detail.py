@@ -28,21 +28,32 @@ def get_data(filters):
         
         return data
     else:
-        data =frappe.db.sql(""" SELECT DISTINCT cu.sales_person as sales_person_name,cu.customer_name as customer_name,co.address as contact_address,CONCAT_WS(' ' ,co.first_name,co.last_name) as contact_person,co.creation as creation_date,co.status as contact_status,co.designation as designation,co.department as department,co.mobile_no as mobile_no,co.phone as landline,co.email_id as email_id, co.area_of_interest_2 as area_of_interest_2,co.hplc as hplc,co.uplc as uplc,co.gchs as gchs,co.gcms as gcms,co.lcms as lcms,co.icp_ as icp,co._kfr as kfr,co.ic as ic,co.ph_ as ph,co.icpms as icpms,co.ftir_ as ftir,co.dissolution as dissolution,co.malvern as malvern  FROM tabCustomer cu JOIN tabContact co ON cu.customer_name=co.company_name """,as_dict=1,debug=1)
+        data =frappe.db.sql(""" SELECT DISTINCT dl.parent,dl.link_name as customer_link_name,co.address as contact_address,CONCAT_WS(' ' ,co.first_name,co.last_name) as contact_person,co.creation as creation_date,co.status as contact_status,co.designation as designation,co.department as department,co.mobile_no as mobile_no,co.phone as landline,co.email_id as email_id, co.area_of_interest_2 as area_of_interest_2,co.hplc as hplc,co.uplc as uplc,co.gchs as gchs,co.gcms as gcms,co.lcms as lcms,co.icp_ as icp,co._kfr as kfr,co.ic as ic,co.ph_ as ph,co.icpms as icpms,co.ftir_ as ftir,co.dissolution as dissolution,co.malvern as malvern  
+            FROM tabContact co  JOIN `tabDynamic Link` dl  on co.name=dl.parent""",as_dict=1,debug=1)
+        #print("in data--------------------",data)
         address_list = [adrs.contact_address for adrs in data]
         
         data1 = frappe.db.sql("""SELECT name,city as ad_city,CONCAT_WS(' ' , address_line1,address_line2,city,state,gst_state_number,pincode,country)as full_address,state as ad_state FROM tabAddress""",as_dict=1,debug=1)
 
-        add_list = []
-        for i in address_list:
-            if i != None:
-                add_list.append(i)
-        
         for row in data:
             for row1 in data1:
                 if row.get('contact_address') == row1.get('name'):
                     row.update(row1)
-                
+        #print("Final Data==========",data)      
+        data2= frappe.db.sql("""SELECT sales_person as sales_person_name,customer_name as customer_name from tabCustomer""",as_dict=1,debug=1)
+        #print("*************",data2)    
+        add_list = []
+        for i in address_list:
+            if i != None:
+                add_list.append(i)
+
+        for row in data:
+            for row1 in data2:
+                if row.get('customer_link_name') == row1.get('customer_name'):
+                    #row.update(row1)
+                    row.update({'sales_person_name':(row1.get('sales_person_name'))})
+                    row.update({'customer_link_name':(row1.get('customer_name'))})
+                    
         return data
 
 def get_columns(filters):
@@ -55,19 +66,25 @@ def get_columns(filters):
             "width": 80,
         },
         {
-            "label": _("Customer Name"),
-            "fieldname": "customer_name",
+            "label": _("Account Name"),
+            "fieldname": "customer_link_name",
             "fieldtype": "Data",
             "width": 80,
         },
+        {
+            "label": _("Account-New/Existing"),
+            "fieldname": "creation_date",
+            "fieldtype": "Data",
+            "width": 80,
+        },
+        # {
+        #     "label": _("Address"),
+        #     "fieldname": "contact_address",
+        #     "fieldtype": "Data",
+        #     "width": 80,
+        # },
         {
             "label": _("Address"),
-            "fieldname": "contact_address",
-            "fieldtype": "Data",
-            "width": 80,
-        },
-        {
-            "label": _("Full Address"),
             "fieldname": "full_address",
             "fieldtype": "Data",
             "width": 80,
@@ -79,7 +96,7 @@ def get_columns(filters):
             "width": 80,
         },
         {
-            "label": _("State"),
+            "label": _("Location"),
             "fieldname": "ad_state",
             "fieldtype": "Data",
             "width": 80,
@@ -90,13 +107,7 @@ def get_columns(filters):
             "fieldtype": "Data",
             "width": 80,
         },
-        {
-            "label": _("Creation Date"),
-            "fieldname": "creation_date",
-            "fieldtype": "Data",
-            "width": 80,
-        },
-        
+                
         {
             "label": _("Status"),
             "fieldname": "contact_status",
