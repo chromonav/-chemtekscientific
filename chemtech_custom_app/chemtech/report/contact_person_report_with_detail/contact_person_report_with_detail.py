@@ -52,7 +52,7 @@ def get_data(filters):
                 if row.get('customer_link_name') == row1.get('name'):
                     #row.update(row1)
                     row.update({'sales_person_name':(row1.get('sales_person_name'))})
-                    row.update({'customer_link_name':(row1.get('customer_name'))})
+                    #row.update({'customer_link_name':(row1.get('customer_name'))})
                     
         return data
 
