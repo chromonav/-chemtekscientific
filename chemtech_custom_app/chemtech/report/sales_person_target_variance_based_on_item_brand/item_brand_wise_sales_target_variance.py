@@ -31,7 +31,6 @@ def get_data_column(filters, partner_doctype):
 		return columns, data
 
 	for key, value in rows.items():
-		print("-----------in key---------",rows)
 		value.update({frappe.scrub(partner_doctype): key[0], "item_group": key[1],"brand_name":key[2]})
 
 		data.append(value)
@@ -48,7 +47,6 @@ def get_data(filters, period_list, partner_doctype):
 	sales_users, item_groups,brand =[], [], []
 
 	for d in sales_users_data:
-		print("------------in sales_users----------",sales_users)
 		if d.parent not in sales_users:
 			sales_users.append(d.parent)
 
