@@ -4,12 +4,12 @@
   "doctype": "Client Script",
   "dt": "Employee Checkin",
   "enabled": 1,
-  "modified": "2022-08-24 10:40:51.914046",
+  "modified": "2022-08-24 12:07:40.899969",
   "name": "Employee Checkin-Form",
   "parent": null,
   "parentfield": null,
   "parenttype": null,
-  "script": "frappe.ui.form.on('Employee Checkin', {\n\trefresh(frm) {\n\t\t// your code here\n\t\tif(frappe.user_roles.includes('Employee Checkin')){\n\t\t    frm.set_df_property('time', 'read_only', 1)\n\n\t\t}\n\t}\n})",
+  "script": "frappe.ui.form.on('Employee Checkin', {\n\trefresh(frm) {\n\t\t// your code here\n\t\tif(frappe.user_roles[2] === 'Employee Checkin'){\n\t\t    frm.set_df_property('time', 'read_only', 1)\n\n\t\t}\n\t}\n})",
   "view": "Form"
  }
 ]
