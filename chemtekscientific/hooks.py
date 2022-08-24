@@ -11,6 +11,7 @@ app_license = "MIT"
 
 # Includes in <head>
 # ------------------
+fixtures = ["Client Script"]
 
 # include js, css files in header of desk.html
 # app_include_css = "/assets/chemtekscientific/css/chemtekscientific.css"
