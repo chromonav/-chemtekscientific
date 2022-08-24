@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include chemtekscientific *.css
+recursive-include chemtekscientific *.csv
+recursive-include chemtekscientific *.html
+recursive-include chemtekscientific *.ico
+recursive-include chemtekscientific *.js
+recursive-include chemtekscientific *.json
+recursive-include chemtekscientific *.md
+recursive-include chemtekscientific *.png
+recursive-include chemtekscientific *.py
+recursive-include chemtekscientific *.svg
+recursive-include chemtekscientific *.txt
+recursive-exclude chemtekscientific *.pyc
