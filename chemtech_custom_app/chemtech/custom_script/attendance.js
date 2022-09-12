@@ -21,7 +21,7 @@ frappe.ui.form.on('Attendance',  {
             frm.set_df_property('in', 'read_only', 0);
             frm.set_df_property('end_time', 'read_only', 0);
             frm.set_df_property('out', 'read_only', 0);
-            validated = true;
+            //validated = true;
         }
 
     },
