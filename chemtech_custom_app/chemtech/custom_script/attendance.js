@@ -2,6 +2,7 @@ frappe.ui.form.on('Attendance',  {
     validate: function(frm) {
         if(frappe.user_roles.includes('Employee Checkin')) {
             //msgprint('You are only allowed Checkin');
+            frm.set_df_property('attendance_date', 'read_only', 1);
             if (frm.doc.in) {
                 frm.set_df_property('start_time', 'read_only', 1);
                 frm.set_df_property('in', 'read_only', 1);
