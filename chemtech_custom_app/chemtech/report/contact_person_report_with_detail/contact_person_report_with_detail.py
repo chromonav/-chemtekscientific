@@ -40,7 +40,7 @@ def get_data(filters):
                 if row.get('contact_address') == row1.get('name'):
                     row.update(row1)
         #print("Final Data==========",data)      
-        data2= frappe.db.sql("""SELECT sales_person as sales_person_name,customer_name as customer_name from tabCustomer""",as_dict=1,debug=1)
+        data2= frappe.db.sql("""SELECT sales_person as sales_person_name,name,customer_name as customer_name from tabCustomer""",as_dict=1,debug=1)
         #print("*************",data2)    
         add_list = []
         for i in address_list:
@@ -49,10 +49,10 @@ def get_data(filters):
 
         for row in data:
             for row1 in data2:
-                if row.get('customer_link_name') == row1.get('customer_name'):
+                if row.get('customer_link_name') == row1.get('name'):
                     #row.update(row1)
                     row.update({'sales_person_name':(row1.get('sales_person_name'))})
-                    row.update({'customer_link_name':(row1.get('customer_name'))})
+                    #row.update({'customer_link_name':(row1.get('customer_name'))})
                     
         return data
 
