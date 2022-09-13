@@ -16,7 +16,7 @@ def get_shift_time_detail(start_time,doc):
 	# #print datetime_obj
 	# print("@@@@@@@@@",datetime_obj)
 
-	frm_start_time = datetime.strptime(doc.get('start_time') , '%H:%M:%S.%f').time()
+	frm_start_time = datetime.strptime(doc.get('start_time') , '%H:%M:%S').time()
 
 	shift_start_time = frappe.db.get_value("Shift Type",{'name':shift},"start_time")
 	shift_start_time2 = datetime.strptime(str(shift_start_time),'%H:%M:%S').time()
@@ -36,7 +36,6 @@ def get_shift_time_detail(start_time,doc):
 		print("++++++++++++early_by_time",early_by_time)
 
 		return early_by_time,late_by_time
-
 
 
 #------------------------------------------------------------------------------------------------------------
