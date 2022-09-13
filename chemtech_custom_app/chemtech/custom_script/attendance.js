@@ -23,11 +23,11 @@ frappe.ui.form.on('Attendance',  {
         if(frappe.session.user === 'Administrator') {
             frm.set_df_property('attendance_date', 'read_only',  0);
             //msgprint('You are only allowed edit doc');
-            /*frm.set_df_property('start_time', 'read_only', 0);
+            frm.set_df_property('start_time', 'read_only', 0);
             frm.set_df_property('in', 'read_only', 0);
             frm.set_df_property('end_time', 'read_only', 0);
             frm.set_df_property('out', 'read_only', 0);
-            */
+            
         }
 
     },
