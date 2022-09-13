@@ -58,7 +58,7 @@ def get_shift_time_detail(start_time,doc):
 	# #print datetime_obj
 	# print("@@@@@@@@@",datetime_obj)
 
-	frm_start_time = datetime.strptime(doc.get('start_time') , '%H:%M:%S.%f').time()
+	frm_start_time = datetime.strptime(doc.get('start_time') , '%H:%M:%S').time()
 
 	shift_start_time = frappe.db.get_value("Shift Type",{'name':shift},"start_time")
 	shift_start_time2 = datetime.strptime(str(shift_start_time),'%H:%M:%S').time()
@@ -66,7 +66,7 @@ def get_shift_time_detail(start_time,doc):
 	print("~~~~~~~~~~~~~~~~~~",type(shift_start_time),type(start_time),frm_start_time)
 
 	if frm_start_time < shift_start_time2:
-		print("*****************",shift_start_time2,frm-start_time)
+		print("*****************",shift_start_time2,frm_start_time)
 		early_by_time = datetime.combine(date.today(), shift_start_time2) - datetime.combine(date.today(), frm_start_time)
 		print("++++++++++++early_by_time",early_by_time)
 
