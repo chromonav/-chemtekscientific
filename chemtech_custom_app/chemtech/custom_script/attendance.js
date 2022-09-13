@@ -20,6 +20,10 @@ frappe.ui.form.on('Attendance',  {
             }
             
         }
+        
+
+    },
+    refresh:function(frm){
         if(frappe.session.user === 'Administrator') {
             frm.set_df_property('attendance_date', 'read_only',  0);
             //msgprint('You are only allowed edit doc');
@@ -29,39 +33,36 @@ frappe.ui.form.on('Attendance',  {
             frm.set_df_property('out', 'read_only', 0);
             
         }
-
-    },
-    refresh:function(frm){
-    if(frm.doc.shift)
-        {
-            console.log("&&&&&&&&&in shift&&&&",cur_frm.doc.shift);
-            if(frm.doc.start_time)
+        if(frm.doc.shift)
             {
-                console.log("##",frm.doc.start_time);
-                frappe.call({
-                        method: 'chemtech_custom_app.chemtech.custom_script.attendance.get_shift_time_detail',
-                        args: {
-                            //shift: frm.doc.shift,
-                            start_time:cur_frm.doc.start_time,
-                            doc:cur_frm.doc
+                console.log("&&&&&&&&&in shift&&&&",cur_frm.doc.shift);
+                if(frm.doc.start_time)
+                {
+                    console.log("##",frm.doc.start_time);
+                    frappe.call({
+                            method: 'chemtech_custom_app.chemtech.custom_script.attendance.get_shift_time_detail',
+                            args: {
+                                //shift: frm.doc.shift,
+                                start_time:cur_frm.doc.start_time,
+                                doc:cur_frm.doc
 
-                        },
-                        callback:function(r){
-                            if(r.message)                            
-                            {
-                                console.log(r)
-                                cur_frm.set_value("early_by",r.message[0]);
+                            },
+                            callback:function(r){
+                                if(r.message)                            
+                                {
+                                    console.log(r)
+                                    cur_frm.set_value("early_by",r.message[0]);
 
-                                console.log("in early_by",cur_frm.doc.early_by)
-                                cur_frm.set_value("late_by",r.message[1]);
-                                console.log("in late_by",cur_frm.doc.late_by)
-                                //refresh_field("early_by");
-                            
+                                    console.log("in early_by",cur_frm.doc.early_by)
+                                    cur_frm.set_value("late_by",r.message[1]);
+                                    console.log("in late_by",cur_frm.doc.late_by)
+                                    //refresh_field("early_by");
+
+                                }
                             }
-                        }
-                    });
+                        });
+                }
             }
-        }
     }
 });
 
