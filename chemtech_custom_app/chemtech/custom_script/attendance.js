@@ -23,6 +23,7 @@ frappe.ui.form.on('Attendance',  {
             }
             
         }
+        else{frm.set_df_property('attendance_date', 'read_only', 0);}
        /* if(frappe.session.user == 'Administrator') {
             frm.set_df_property('attendance_date', 'read_only', 0);
         }*/
