@@ -4,7 +4,7 @@ frappe.ui.form.on('Attendance',  {
         console.log("in js");
         
         if(frappe.user_roles.includes('Employee Checkin') && frappe.session.user != 'Administrator') {
-             
+             frm.set_df_property('attendance_date', 'read_only', 1);
             //msgprint('You are only allowed Checkin');
             if (frm.doc.in) {
                 frm.set_df_property('start_time', 'read_only', 1);
@@ -23,9 +23,9 @@ frappe.ui.form.on('Attendance',  {
             }
             
         }
-        if(frappe.session.user == 'Administrator') {
+       /* if(frappe.session.user == 'Administrator') {
             frm.set_df_property('attendance_date', 'read_only', 0);
-        }
+        }*/
 
     
     
