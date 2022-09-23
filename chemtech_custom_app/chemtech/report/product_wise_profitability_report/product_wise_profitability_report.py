@@ -49,7 +49,7 @@ def get_data(filters):
     pii.taxable_value as po_taxable_value,po.company,pii.item_tax_template as pii_item_tax_template,
     po.total_taxes_and_charges as po_gst_tax_amount,(pii.taxable_value+po.total_taxes_and_charges) as pi_total_value from `tabPurchase Invoice Item` pii 
     join `tabPurchase Order` po  on pii.purchase_order=po.name join `tabSales Invoice` si  on po.company=si.company where po.company='{1}'
-     and  pii.item_code in {0} and po.transaction_date<si.posting_date """.format(tuple(item_code_list),filters.get('company')),as_dict=1)
+     and  pii.item_code in {0} and po.transaction_date<si.posting_date """.format(tuple(item_code_list),filters.get('company')),as_dict=1,debug=1)
     
 
     for row in data:
