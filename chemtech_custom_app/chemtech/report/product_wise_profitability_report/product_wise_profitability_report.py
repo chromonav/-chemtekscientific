@@ -22,7 +22,6 @@ def execute(filters=None):
 	validate_filters(filters)
 
 	columns = get_columns(filters)
-	#conditions = get_conditions(filters)
 	data = get_data(filters)
 	return columns, data, None
 
