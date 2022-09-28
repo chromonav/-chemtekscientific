@@ -14,8 +14,6 @@ from frappe.utils import date_diff, flt, getdate
 
 
 def execute(filters=None):
-	""" columns, data = [], []
-	return columns, data """
 	if not filters:
 		return [], [], None, []
 
