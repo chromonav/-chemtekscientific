@@ -38,7 +38,7 @@ def get_data(filters):
     ad.city as location,sii.item_code as item_code,sii.brand as si_brand,sii.item_name,sii.rate as si_rate,sii.item_tax_template as sii_item_tax_template,
     sii.qty as si_qty,sii.lot_number as lot_no,sii.taxable_value as si_taxable_value,si.total_taxes_and_charges as si_gst_tax_amount,
     (si.total_taxes_and_charges+sii.taxable_value) as si_total_value FROM `tabSales Invoice` si JOIN `tabSales Invoice Item` sii on sii.parent = si.name
-    JOIN `tabAddress` ad ON si.customer_address = ad.name WHERE posting_date BETWEEN '{0}' and '{1}' and si.company='{2}' """
+    JOIN `tabAddress` ad ON si.customer_address = ad.name WHERE posting_date BETWEEN '{0}' and '{1}' and si.company='{2}' and si.status not in ('Rerurn','Cancelled')"""
     .format(filters.get('from_date'), filters.get('to_date'),filters.get('company')),as_dict=1,debug=1)
     item_code_list = [item.item_code for item in data]
     
