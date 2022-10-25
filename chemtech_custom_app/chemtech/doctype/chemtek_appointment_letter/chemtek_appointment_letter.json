@@ -1,0 +1,172 @@
+{
+ "actions": [],
+ "creation": "2022-10-25 12:06:28.884056",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "job_offer",
+  "job_applicant",
+  "offer_date",
+  "column_break_4",
+  "company",
+  "department",
+  "designation",
+  "section_break_8",
+  "basic",
+  "hra",
+  "provident_fund",
+  "gross_salary",
+  "column_break_13",
+  "esic",
+  "pt",
+  "statutory_bonus",
+  "ctc",
+  "section_break_7",
+  "select_terms",
+  "terms"
+ ],
+ "fields": [
+  {
+   "fieldname": "job_offer",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Job Offer",
+   "options": "Job Offer",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "job_offer.applicant_name",
+   "fieldname": "job_applicant",
+   "fieldtype": "Data",
+   "label": "Job Applicant"
+  },
+  {
+   "fetch_from": "job_offer.offer_date",
+   "fieldname": "offer_date",
+   "fieldtype": "Data",
+   "label": "Offer Date"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "job_offer.company",
+   "fieldname": "company",
+   "fieldtype": "Data",
+   "label": "Company"
+  },
+  {
+   "fetch_from": "job_offer.department",
+   "fieldname": "department",
+   "fieldtype": "Data",
+   "label": "Department"
+  },
+  {
+   "fetch_from": "job_offer.designation",
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fieldname": "section_break_8",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fetch_from": "job_offer.basic",
+   "fieldname": "basic",
+   "fieldtype": "Currency",
+   "label": "Basic",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "job_offer.hra",
+   "fieldname": "hra",
+   "fieldtype": "Currency",
+   "label": "HRA",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "job_offer.provident_fund",
+   "fieldname": "provident_fund",
+   "fieldtype": "Currency",
+   "label": "Provident Fund"
+  },
+  {
+   "fetch_from": "job_offer.gross_salary",
+   "fieldname": "gross_salary",
+   "fieldtype": "Currency",
+   "label": "Gross Salary"
+  },
+  {
+   "fieldname": "column_break_13",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fetch_from": "job_offer.esic",
+   "fieldname": "esic",
+   "fieldtype": "Currency",
+   "label": "ESIC",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "job_offer.pt",
+   "fieldname": "pt",
+   "fieldtype": "Currency",
+   "label": "PT",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "job_offer.statutory_bonus",
+   "fieldname": "statutory_bonus",
+   "fieldtype": "Currency",
+   "label": "Statutory Bonus"
+  },
+  {
+   "fetch_from": "job_offer.ctc",
+   "fieldname": "ctc",
+   "fieldtype": "Currency",
+   "label": "CTC",
+   "read_only": 1
+  },
+  {
+   "fieldname": "section_break_7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "select_terms",
+   "fieldtype": "Link",
+   "label": "Select Terms and Conditions",
+   "options": "Terms and Conditions"
+  },
+  {
+   "fieldname": "terms",
+   "fieldtype": "Text Editor",
+   "label": "Terms and Conditions"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-10-25 12:06:28.884056",
+ "modified_by": "Administrator",
+ "module": "ChemTech",
+ "name": "Chemtek Appointment Letter",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
