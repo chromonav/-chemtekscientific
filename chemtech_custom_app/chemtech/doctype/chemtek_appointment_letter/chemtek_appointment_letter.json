@@ -15,12 +15,23 @@
   "section_break_8",
   "basic",
   "hra",
-  "provident_fund",
+  "education",
+  "special_allowance",
+  "travelling_allowance",
+  "cca_allowance",
+  "variable_pay",
+  "incentives",
   "gross_salary",
   "column_break_13",
+  "provident_fund",
   "esic",
   "pt",
   "statutory_bonus",
+  "lwf",
+  "income_tax",
+  "advance",
+  "total_deduction",
+  "net_pay",
   "ctc",
   "section_break_7",
   "select_terms",
@@ -107,20 +118,19 @@
    "fetch_from": "job_offer.esic",
    "fieldname": "esic",
    "fieldtype": "Currency",
-   "label": "ESIC",
-   "read_only": 1
+   "label": "ESIC"
   },
   {
    "fetch_from": "job_offer.pt",
    "fieldname": "pt",
    "fieldtype": "Currency",
-   "label": "PT",
-   "read_only": 1
+   "label": "PT"
   },
   {
    "fetch_from": "job_offer.statutory_bonus",
    "fieldname": "statutory_bonus",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Statutory Bonus"
   },
   {
@@ -144,11 +154,66 @@
    "fieldname": "terms",
    "fieldtype": "Text Editor",
    "label": "Terms and Conditions"
+  },
+  {
+   "fieldname": "education",
+   "fieldtype": "Currency",
+   "label": "Education"
+  },
+  {
+   "fieldname": "special_allowance",
+   "fieldtype": "Currency",
+   "label": "Special Allowance"
+  },
+  {
+   "fieldname": "travelling_allowance",
+   "fieldtype": "Currency",
+   "label": "Travelling Allowance"
+  },
+  {
+   "fieldname": "cca_allowance",
+   "fieldtype": "Currency",
+   "label": "CCA Allowance"
+  },
+  {
+   "fieldname": "variable_pay",
+   "fieldtype": "Currency",
+   "label": "Variable Pay"
+  },
+  {
+   "fieldname": "incentives",
+   "fieldtype": "Currency",
+   "label": "Incentives"
+  },
+  {
+   "fieldname": "lwf",
+   "fieldtype": "Currency",
+   "label": "LWF"
+  },
+  {
+   "fieldname": "income_tax",
+   "fieldtype": "Currency",
+   "label": "Income Tax"
+  },
+  {
+   "fieldname": "advance",
+   "fieldtype": "Currency",
+   "label": "Advance"
+  },
+  {
+   "fieldname": "total_deduction",
+   "fieldtype": "Currency",
+   "label": "Total Deduction"
+  },
+  {
+   "fieldname": "net_pay",
+   "fieldtype": "Currency",
+   "label": "Net Pay"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-10-25 12:06:28.884056",
+ "modified": "2022-11-17 15:42:50.472562",
  "modified_by": "Administrator",
  "module": "ChemTech",
  "name": "Chemtek Appointment Letter",
