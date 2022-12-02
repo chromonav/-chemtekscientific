@@ -62,7 +62,7 @@ def get_data(conditions, filters):
 		company_list = ['Chemtek Scientific Private Limited-Hyd','Chemtek Scientific Private Limited','Chemtek Scientific Private Limited-Bangalore','Chemtek Scientific Private Limited- Vapi','Chemtek Scientific Company','Lab-Quest International','Labserve  International']
 		data = frappe.db.sql(
 			"""
-			SELECT
+			SELECT  DISTINCT
 				so.transaction_date as date,
 				soi.delivery_date as delivery_date,
 				so.name as sales_order,
@@ -93,6 +93,31 @@ def get_data(conditions, filters):
 			ORDER BY so.transaction_date ASC, soi.item_code ASC
 		""".format(tuple(company_list),conditions=conditions),filters,as_dict=1,debug=1)
 
+		sales_order_list = []
+		item_code_list = []
+		for row in data:
+			if row.sales_order != None:
+				#print("++++++++++++++",row.sales_order)
+				sales_order_list.append(row.sales_order)
+			if row.item_code != None:
+				#print("++++++++++++++",row.sales_order)
+				item_code_list.append(row.item_code)
+		#print("==========",sales_order_list)
+		#print("#######",item_code_list)
+
+
+		data1 = frappe.db.sql(""" SELECT DISTINCT poi.material_request as material_request,poi.sales_order as sales_order_in_po,
+			poi.parent as purchase_order,po.supplier as supplier_name ,poi.qty as po_qty,poi.schedule_date as EDD,poi.rate as unit_price,poi.amount as total_amount,
+			po.transaction_date as po_date
+			from `tabPurchase Order Item` poi 
+			join `tabSales Order`so on poi.sales_order=so.name join `tabPurchase Order`po on po.name=poi.parent where so.name in {0}
+			""".format(tuple(sales_order_list)),as_dict=1,debug = 1)
+		
+		for row1 in data:
+			for row2 in data1:
+				if row1.get('sales_order') == row2.get('sales_order_in_po'):
+					row1.update(row2)
+
 		return data
 	else:
 		# nosemgrep
@@ -101,7 +126,7 @@ def get_data(conditions, filters):
 
 		data = frappe.db.sql(
 			"""
-			SELECT
+			SELECT DISTINCT
 				so.transaction_date as date,
 				soi.delivery_date as delivery_date,
 				so.name as sales_order,
@@ -130,6 +155,30 @@ def get_data(conditions, filters):
 			GROUP BY soi.name
 			ORDER BY so.transaction_date ASC, soi.item_code ASC
 		""".format(tuple(company_list)),as_dict=1,debug = 1)
+
+		sales_order_list = []
+		item_code_list = []
+		for row in data:
+			if row.sales_order != None:
+				#print("++++++++++++++",row.sales_order)
+				sales_order_list.append(row.sales_order)
+			if row.item_code != None:
+				#print("++++++++++++++",row.sales_order)
+				item_code_list.append(row.item_code)
+		#print("==========",sales_order_list)
+		#print("#######",item_code_list)
+
+
+		data1 = frappe.db.sql(""" SELECT DISTINCT poi.material_request as material_request,poi.sales_order as sales_order_in_po,poi.amount as total_amount,
+			poi.parent as purchase_order,po.supplier as supplier_name ,poi.qty as po_qty,poi.schedule_date as EDD,poi.rate as unit_price,po.transaction_date as po_date
+			from `tabPurchase Order Item` poi 
+			join `tabSales Order`so on poi.sales_order=so.name join `tabPurchase Order`po on po.name=poi.parent where so.name in {0}
+			""".format(tuple(sales_order_list)),as_dict=1,debug = 1)
+		
+		for row1 in data:
+			for row2 in data1:
+				if row1.get('sales_order') == row2.get('sales_order_in_po'):
+					row1.update(row2)
 
 		return data
 
@@ -256,6 +305,10 @@ def get_columns(filters):
 			"options": "Sales Order",
 			"width": 160,
 		},
+		
+		
+
+
 		{"label": _("Status"), "fieldname": "status", "fieldtype": "Data", "width": 130},
 		{
 			"label": _("Customer"),
@@ -276,6 +329,8 @@ def get_columns(filters):
 				"width": 100,
 			}
 		)
+		
+
 		columns.append(
 			{"label": _("Description"), "fieldname": "description", "fieldtype": "Small Text", "width": 100}
 		)
@@ -378,5 +433,57 @@ def get_columns(filters):
 			"width": 100,
 		}
 	)
-
+	columns.extend(
+	[
+		{
+			"label": _("Material Request"),
+			"fieldname": "material_request",
+			"fieldtype": "Link",
+			"options": "Material Request",
+			"width": 160,
+		},
+		{
+			"label": _("Purchase Order"),
+			"fieldname": "purchase_order",
+			"fieldtype": "Link",
+			"options": "Purchase Order",
+			"width": 160,
+		},
+		{
+			"label": _("PO Date"),
+			"fieldname": "po_date",
+			"fieldtype": "Data",
+			"width": 160,
+		},
+		{
+			"label": _("Supplier"),
+			"fieldname": "supplier_name",
+			"fieldtype": "Data",
+			"width": 160,
+		},
+		{
+			"label": _("PO Qty"),
+			"fieldname": "po_qty",
+			"fieldtype": "Data",
+			"width": 160,
+		},
+		{
+			"label": _("Unit Purchase Price"),
+			"fieldname": "unit_price",
+			"fieldtype": "Data",
+			"width": 160,
+		},
+		{
+			"label": _("Total Amount"),
+			"fieldname": "total_amount",
+			"fieldtype": "Data",
+			"width": 160,
+		},
+		{
+			"label": _("EDD"),
+			"fieldname": "EDD",
+			"fieldtype": "Data",
+			"width": 160,
+		}
+	])
 	return columns
