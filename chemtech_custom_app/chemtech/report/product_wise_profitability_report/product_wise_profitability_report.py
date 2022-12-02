@@ -79,6 +79,7 @@ def get_data(filters):
      where sed.item_code in {0} and se.company= '{1}' and se.posting_date < si.posting_date
         """.format(tuple(item_code_list),filters.get('company')),as_dict=1,debug=1)
     
+
     si_gst_list = []
     si_test_list=[]
     si_Final_gst=[]
@@ -252,7 +253,13 @@ def get_columns(filters):
             "fieldtype": "Data",
             "width": 50,
         },
-        
+
+        #{
+        #     "label": _("Batch_NO"),
+        #     "fieldname": "si_batch_no",
+        #     "fieldtype": "Data",
+        #     "width": 50,
+        #},
         # {
         #     "label": _("Lot No"),
         #     "fieldname": "lot_no",
