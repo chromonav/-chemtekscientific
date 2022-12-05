@@ -78,7 +78,23 @@ def get_data(filters):
      where sed.item_code in {0} and se.company= '{1}' and se.posting_date < si.posting_date
         """.format(tuple(item_code_list),filters.get('company')),as_dict=1,debug=1)
     
-
+    
+    si_gst_list = []
+    si_test_list=[]
+    si_Final_gst=[]
+    for row2 in data:
+        if (row2.get('sii_item_tax_template')!=None):
+            si_temp = re.findall(r'\d+', row2.get('sii_item_tax_template'))
+            si_res = list(map(int, si_temp))
+            si_gst_list.append(si_res)
+            for i in si_gst_list:
+                si_test_list = [str(element) for element in i]  
+                 
+                si_new_integer = int(''.join(si_test_list))
+                si_Final_gst.append(si_new_integer)
+                 
+            for i in si_Final_gst:
+                row2.update({'si_gst_tax_amount':((row2.get('si_rate')*row2.get('si_qty'))*flt(i/100))})
     #----------- get tax int value for PI starts-------------- 
     pi_gst_list = []
     pi_test_list=[]
