@@ -126,37 +126,37 @@
    "label": "Education"
   },
   {
-   "fetch_from": "job_offer.special_allowance",
+   //"fetch_from": "job_offer.special_allowance",
    "fieldname": "special_allowance",
    "fieldtype": "Currency",
    "label": "Special Allowance"
   },
   {
-   "fetch_from": "job_offer.travelling_allowance",
+   //"fetch_from": "job_offer.travelling_allowance",
    "fieldname": "travelling_allowance",
    "fieldtype": "Currency",
    "label": "Travelling Allowance"
   },
   {
-   "fetch_from": "job_offer.cca_allowance",
+   //"fetch_from": "job_offer.cca_allowance",
    "fieldname": "cca_allowance",
    "fieldtype": "Currency",
    "label": "CCA Allowance"
   },
   {
-   "fetch_from": "job_offer.variable_pay",
+   //"fetch_from": "job_offer.variable_pay",
    "fieldname": "variable_pay",
    "fieldtype": "Currency",
    "label": "Variable Pay"
   },
   {
-   "fetch_from": "job_offer.incentives",
+   //"fetch_from": "job_offer.incentives",
    "fieldname": "incentives",
    "fieldtype": "Currency",
    "label": "Incentives"
   },
   {
-   "fetch_from": "job_offer.gross_salary",
+   //"fetch_from": "job_offer.gross_salary",
    "fieldname": "gross_salary",
    "fieldtype": "Currency",
    "label": "Gross Salary"
@@ -166,44 +166,44 @@
    "fieldtype": "Column Break"
   },
   {
-   "fetch_from": "job_offer.provident_fund",
+  // "fetch_from": "job_offer.provident_fund",
    "fieldname": "provident_fund",
    "fieldtype": "Currency",
    "label": "Provident Fund"
   },
   {
-   "fetch_from": "job_offer.esic",
+  // "fetch_from": "job_offer.esic",
    "fieldname": "esic",
    "fieldtype": "Currency",
    "label": "ESIC"
   },
   {
-   "fetch_from": "job_offer.pt",
+   //"fetch_from": "job_offer.pt",
    "fieldname": "pt",
    "fieldtype": "Currency",
    "label": "PT"
   },
   {
-   "fetch_from": "job_offer.statutory_bonus",
+   //"fetch_from": "job_offer.statutory_bonus",
    "fieldname": "statutory_bonus",
    "fieldtype": "Currency",
    "hidden": 1,
    "label": "Statutory Bonus"
   },
   {
-   "fetch_from": "job_offer.lwf",
+   //"fetch_from": "job_offer.lwf",
    "fieldname": "lwf",
    "fieldtype": "Currency",
    "label": "LWF"
   },
   {
-   "fetch_from": "job_offer.income_tax",
+   //"fetch_from": "job_offer.income_tax",
    "fieldname": "income_tax",
    "fieldtype": "Currency",
    "label": "Income Tax"
   },
   {
-   "fetch_from": "job_offer.advance",
+   //"fetch_from": "job_offer.advance",
    "fieldname": "advance",
    "fieldtype": "Currency",
    "label": "Advance"
@@ -219,7 +219,7 @@
    "label": "Net Pay"
   },
   {
-   "fetch_from": "job_offer.ctc",
+   //"fetch_from": "job_offer.ctc",
    "fieldname": "ctc",
    "fieldtype": "Currency",
    "label": "CTC",
