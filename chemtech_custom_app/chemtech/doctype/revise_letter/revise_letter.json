@@ -5,8 +5,7 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "job_offer",
-  "job_applicant",
+  "employee_name",
   "offer_date",
   "column_break_4",
   "company",
@@ -60,46 +59,31 @@
  ],
  "fields": [
   {
-   "fieldname": "job_offer",
-   "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Job Offer",
-   "options": "Job Offer",
-   "reqd": 1
-  },
-  {
-   "fetch_from": "job_offer.applicant_name",
-   "fieldname": "job_applicant",
-   "fieldtype": "Data",
-   "label": "Job Applicant"
-  },
-  {
-   "fetch_from": "job_offer.offer_date",
    "fieldname": "offer_date",
-   "fieldtype": "Data",
-   "label": "Offer Date"
+   "fieldtype": "Date",
+   "label": "Issue Date"
   },
   {
    "fieldname": "column_break_4",
    "fieldtype": "Column Break"
   },
   {
-   "fetch_from": "job_offer.company",
    "fieldname": "company",
-   "fieldtype": "Data",
-   "label": "Company"
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
   },
   {
-   "fetch_from": "job_offer.department",
    "fieldname": "department",
-   "fieldtype": "Data",
-   "label": "Department"
+   "fieldtype": "Link",
+   "label": "Department",
+   "options": "Department"
   },
   {
-   "fetch_from": "job_offer.designation",
    "fieldname": "designation",
-   "fieldtype": "Data",
-   "label": "Designation"
+   "fieldtype": "Link",
+   "label": "Designation",
+   "options": "Designation"
   },
   {
    "collapsible": 1,
@@ -126,37 +110,37 @@
    "label": "Education"
   },
   {
-   //"fetch_from": "job_offer.special_allowance",
+   "fetch_from": "job_offer.special_allowance",
    "fieldname": "special_allowance",
    "fieldtype": "Currency",
    "label": "Special Allowance"
   },
   {
-   //"fetch_from": "job_offer.travelling_allowance",
+   "fetch_from": "job_offer.travelling_allowance",
    "fieldname": "travelling_allowance",
    "fieldtype": "Currency",
    "label": "Travelling Allowance"
   },
   {
-   //"fetch_from": "job_offer.cca_allowance",
+   "fetch_from": "job_offer.cca_allowance",
    "fieldname": "cca_allowance",
    "fieldtype": "Currency",
    "label": "CCA Allowance"
   },
   {
-   //"fetch_from": "job_offer.variable_pay",
+   "fetch_from": "job_offer.variable_pay",
    "fieldname": "variable_pay",
    "fieldtype": "Currency",
    "label": "Variable Pay"
   },
   {
-   //"fetch_from": "job_offer.incentives",
+   "fetch_from": "job_offer.incentives",
    "fieldname": "incentives",
    "fieldtype": "Currency",
    "label": "Incentives"
   },
   {
-   //"fetch_from": "job_offer.gross_salary",
+   "fetch_from": "job_offer.gross_salary",
    "fieldname": "gross_salary",
    "fieldtype": "Currency",
    "label": "Gross Salary"
@@ -166,44 +150,44 @@
    "fieldtype": "Column Break"
   },
   {
-  // "fetch_from": "job_offer.provident_fund",
+   "fetch_from": "job_offer.provident_fund",
    "fieldname": "provident_fund",
    "fieldtype": "Currency",
    "label": "Provident Fund"
   },
   {
-  // "fetch_from": "job_offer.esic",
+   "fetch_from": "job_offer.esic",
    "fieldname": "esic",
    "fieldtype": "Currency",
    "label": "ESIC"
   },
   {
-   //"fetch_from": "job_offer.pt",
+   "fetch_from": "job_offer.pt",
    "fieldname": "pt",
    "fieldtype": "Currency",
    "label": "PT"
   },
   {
-   //"fetch_from": "job_offer.statutory_bonus",
+   "fetch_from": "job_offer.statutory_bonus",
    "fieldname": "statutory_bonus",
    "fieldtype": "Currency",
    "hidden": 1,
    "label": "Statutory Bonus"
   },
   {
-   //"fetch_from": "job_offer.lwf",
+   "fetch_from": "job_offer.lwf",
    "fieldname": "lwf",
    "fieldtype": "Currency",
    "label": "LWF"
   },
   {
-   //"fetch_from": "job_offer.income_tax",
+   "fetch_from": "job_offer.income_tax",
    "fieldname": "income_tax",
    "fieldtype": "Currency",
    "label": "Income Tax"
   },
   {
-   //"fetch_from": "job_offer.advance",
+   "fetch_from": "job_offer.advance",
    "fieldname": "advance",
    "fieldtype": "Currency",
    "label": "Advance"
@@ -219,26 +203,11 @@
    "label": "Net Pay"
   },
   {
-   //"fetch_from": "job_offer.ctc",
+   "fetch_from": "job_offer.ctc",
    "fieldname": "ctc",
    "fieldtype": "Currency",
    "label": "CTC",
    "read_only": 1
-  },
-  {
-   "fieldname": "section_break_7",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "select_terms",
-   "fieldtype": "Link",
-   "label": "Select Terms and Conditions",
-   "options": "Terms and Conditions"
-  },
-  {
-   "fieldname": "terms",
-   "fieldtype": "Text Editor",
-   "label": "Terms and Conditions"
   },
   {
    "collapsible": 1,
@@ -344,11 +313,31 @@
    "fieldname": "revised_ctc",
    "fieldtype": "Currency",
    "label": "Revised CTC"
+  },
+  {
+   "fieldname": "section_break_7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "select_terms",
+   "fieldtype": "Link",
+   "label": "Select Terms and Conditions",
+   "options": "Terms and Conditions"
+  },
+  {
+   "fieldname": "terms",
+   "fieldtype": "Text Editor",
+   "label": "Terms and Conditions"
+  },
+  {
+   "fieldname": "employee_name",
+   "fieldtype": "Data",
+   "label": "Employee Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-11-21 10:54:52.937458",
+ "modified": "2022-12-07 13:29:41.543657",
  "modified_by": "Administrator",
  "module": "ChemTech",
  "name": "Revise Letter",
