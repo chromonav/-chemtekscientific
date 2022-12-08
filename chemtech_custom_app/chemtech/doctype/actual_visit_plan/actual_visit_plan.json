@@ -1,0 +1,42 @@
+{
+ "actions": [],
+ "autoname": "ACT-VP-.####",
+ "creation": "2022-12-06 16:54:32.040538",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "actual_visit_plan"
+ ],
+ "fields": [
+  {
+   "fieldname": "actual_visit_plan",
+   "fieldtype": "Table",
+   "label": "Actual Visit Plan",
+   "options": "Visit Plan"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2022-12-07 11:36:01.897917",
+ "modified_by": "Administrator",
+ "module": "ChemTech",
+ "name": "Actual Visit Plan",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
