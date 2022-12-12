@@ -515,7 +515,7 @@ def get_actual_data(filters, item_name,brand,customer, sales_users_or_territory_
 		cond = "`tab{0}`.{1} in ({2})".format(
 			filters.get("doctype"), sales_field, ",".join(["%s"] * len(sales_p))
 		)
-	print(f"""\n\n\n\nitem_name in actual_data()----{item_name}\n\n\n""")
+	#print(f"""\n\n\n\nitem_name in actual_data()----{item_name}\n\n\n""")
 	filters_items_group = " "
 	if (filters.get('item_groups')):
 		filters_items_group = "and `tab{child_doc}`.item_group in ({item_groups}) "
@@ -544,7 +544,7 @@ def get_actual_data(filters, item_name,brand,customer, sales_users_or_territory_
 					'f_to_date':f_to_date
 
 					},as_dict=1,debug=1)
-			print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
+			#print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
 			return data
 
 		if filters.get('doctype')=='Sales Invoice':
@@ -569,7 +569,7 @@ def get_actual_data(filters, item_name,brand,customer, sales_users_or_territory_
 					'f_to_date':f_to_date
 
 					},as_dict=1,debug=1)
-			print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
+			#print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
 			return data
 
 		if filters.get('doctype')=='Delivery Note':
@@ -594,7 +594,7 @@ def get_actual_data(filters, item_name,brand,customer, sales_users_or_territory_
 					'f_to_date':f_to_date
 
 					},as_dict=1,debug=1)
-			print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
+			#print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
 			return data
 		
 	if filters.get('based_on')=='Brand':
@@ -620,7 +620,7 @@ def get_actual_data(filters, item_name,brand,customer, sales_users_or_territory_
 					'f_to_date':f_to_date
 
 					},as_dict=1,debug=1)
-			print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
+			#print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
 			return data
 		if filters.get('doctype')=='Sales Invoice':
 			data = frappe.db.sql(
@@ -644,7 +644,7 @@ def get_actual_data(filters, item_name,brand,customer, sales_users_or_territory_
 					'f_to_date':f_to_date
 
 					},as_dict=1,debug=1)
-			print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
+			#print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
 			return data
 		
 		if filters.get('doctype')=='Delivery Note':
@@ -669,7 +669,7 @@ def get_actual_data(filters, item_name,brand,customer, sales_users_or_territory_
 					'f_to_date':f_to_date
 
 					},as_dict=1,debug=1)
-			print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
+			#print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
 			return data
 
 	if filters.get('based_on')=='Customer':
@@ -695,7 +695,7 @@ def get_actual_data(filters, item_name,brand,customer, sales_users_or_territory_
 					'f_to_date':f_to_date
 
 					},as_dict=1,debug=1)
-			print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
+			#print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
 			return data
 
 		if filters.get('doctype')=='Sales Invoice':
@@ -720,33 +720,33 @@ def get_actual_data(filters, item_name,brand,customer, sales_users_or_territory_
 					'f_to_date':f_to_date
 
 					},as_dict=1,debug=1)
-			print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
+			#print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
 			return data
 		
-			if filters.get('doctype')=='Delivery Note':
-				data = frappe.db.sql(
-				""" SELECT 
-						*
-					FROM 
-						`tabDelivery Note` dn 
-					INNER JOIN
-						`tabDelivery Note Item`dni  
-					ON dni.parent=dn.name 
-					WHERE 
-						dn.docstatus = 1 
-						AND dn.customer in %(customer)s
-						AND dn.sales_person in %(sales_person)s
-						AND dn.posting_date between %(f_from_date)s and %(f_to_date)s
+		if filters.get('doctype')=='Delivery Note':
+			data = frappe.db.sql(
+			""" SELECT 
+					*
+				FROM 
+					`tabDelivery Note` dn 
+				INNER JOIN
+					`tabDelivery Note Item`dni  
+				ON dni.parent=dn.name 
+				WHERE 
+					dn.docstatus = 1 
+					AND dn.customer in %(customer)s
+					AND dn.sales_person in %(sales_person)s
+					AND dn.posting_date between %(f_from_date)s and %(f_to_date)s
 
-					""",{
-						'item_name':item_name,
-						'sales_person':sales_users_or_territory_data,
-						'f_from_date':f_from_date,
-						'f_to_date':f_to_date
+				""",{
+					'customer':customer,
+					'sales_person':sales_users_or_territory_data,
+					'f_from_date':f_from_date,
+					'f_to_date':f_to_date
 
-						},as_dict=1,debug=1)
-				print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
-				return data
+					},as_dict=1,debug=1)
+			#print(f"""\n\n\n\n\nnew-query data = {data}\n\n\n\n\n\n""")
+			return data
 
 def get_parents_data(filters, partner_doctype):
 	filters_dict = {"parenttype": partner_doctype}
