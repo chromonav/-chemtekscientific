@@ -48,8 +48,8 @@ frappe.query_reports["Sales Person Target Variance Based On Item Code"] = {
 			fieldname: "based_on",
 			label: __("Based On"),
 			fieldtype: "Select",
-			default:"Item",
-			options: "Item\nBrand\nCustomer"
+			default:"",
+			options: " \nItem\nBrand\nCustomer"
 		},
 	],
 	"formatter": function (value, row, column, data, default_formatter) {
