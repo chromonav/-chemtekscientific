@@ -1,0 +1,155 @@
+{
+ "actions": [],
+ "autoname": "VP-.####",
+ "creation": "2022-12-06 11:55:26.282349",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "sales_person",
+  "visit_date",
+  "visit_day",
+  "customer",
+  "address",
+  "column_break_5",
+  "location",
+  "state",
+  "visit_purpose",
+  "joint_visit",
+  "actual_visit_section",
+  "actual_customer_visited",
+  "address_visited",
+  "visited_location",
+  "visited_state",
+  "column_break_16",
+  "person_met",
+  "designation",
+  "discussed_on_products",
+  "commentsdiscussion_pointshighlights",
+  "next_stepway_forward"
+ ],
+ "fields": [
+  {
+   "fieldname": "visit_day",
+   "fieldtype": "Data",
+   "label": "Visit Day "
+  },
+  {
+   "fieldname": "address",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Address"
+  },
+  {
+   "fieldname": "customer",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Plan Customer Name",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "location",
+   "fieldtype": "Data",
+   "label": "Location/city"
+  },
+  {
+   "fieldname": "state",
+   "fieldtype": "Data",
+   "label": "State"
+  },
+  {
+   "fieldname": "visit_purpose",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Visit Purpose"
+  },
+  {
+   "fieldname": "joint_visit",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Joint Visit"
+  },
+  {
+   "fieldname": "column_break_5",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "visit_date",
+   "fieldtype": "Date",
+   "label": "Visit Date"
+  },
+  {
+   "fetch_from": "customer.sales_person",
+   "fieldname": "sales_person",
+   "fieldtype": "Link",
+   "label": "Sales Person",
+   "options": "Sales Person"
+  },
+  {
+   "fieldname": "actual_visit_section",
+   "fieldtype": "Section Break",
+   "label": "Actual Visit"
+  },
+  {
+   "fieldname": "actual_customer_visited",
+   "fieldtype": "Link",
+   "label": "Actual Customer Visited",
+   "options": "Customer"
+  },
+  {
+   "fieldname": "address_visited",
+   "fieldtype": "Data",
+   "label": "Address Visited"
+  },
+  {
+   "fieldname": "visited_location",
+   "fieldtype": "Data",
+   "label": "Visited Location "
+  },
+  {
+   "fieldname": "visited_state",
+   "fieldtype": "Data",
+   "label": "Visited State"
+  },
+  {
+   "fieldname": "person_met",
+   "fieldtype": "Data",
+   "label": "Person Met"
+  },
+  {
+   "fieldname": "designation",
+   "fieldtype": "Data",
+   "label": "Designation"
+  },
+  {
+   "fieldname": "discussed_on_products",
+   "fieldtype": "Data",
+   "label": "Discussed on products"
+  },
+  {
+   "fieldname": "commentsdiscussion_pointshighlights",
+   "fieldtype": "Data",
+   "label": "Comments/Discussion points/Highlights"
+  },
+  {
+   "fieldname": "column_break_16",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "next_stepway_forward",
+   "fieldtype": "Data",
+   "label": "Next Step/Way Forward"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2022-12-07 19:23:31.175049",
+ "modified_by": "Administrator",
+ "module": "ChemTech",
+ "name": "Visit Plan",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}
