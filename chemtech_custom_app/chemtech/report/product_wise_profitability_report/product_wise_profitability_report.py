@@ -266,12 +266,12 @@ def get_columns(filters):
             "fieldtype": "Data",
             "width": 50,
         },
-        #{
-        #     "label": _("Batch_NO"),
-        #     "fieldname": "si_batch_no",
-        #     "fieldtype": "Data",
-        #     "width": 50,
-        #},
+        {
+             "label": _("Batch_NO"),
+             "fieldname": "si_batch_no",
+             "fieldtype": "Data",
+             "width": 50,
+        },
         # {
         #     "label": _("Lot No"),
         #     "fieldname": "lot_no",
