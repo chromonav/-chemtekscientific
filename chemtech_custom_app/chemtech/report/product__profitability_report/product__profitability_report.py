@@ -40,9 +40,17 @@ def get_data(filters):
     sii.taxable_value as si_taxable_value,si.total_taxes_and_charges as si_gst_tax_amount,sii.batch_no as si_batch_no
      FROM `tabSales Invoice` si JOIN `tabSales Invoice Item` sii on sii.parent = si.name
     JOIN `tabAddress` ad ON si.customer_address = ad.name WHERE posting_date BETWEEN '{0}' and '{1}' 
-    and si.company='{2}' and si.status not in ('Rerurn','Cancelled')"""
+    and si.company='{2}' and si.status not in ('Return','Cancelled')"""
     .format(filters.get('from_date'), filters.get('to_date'),filters.get('company')),as_dict=1,debug=1)
     item_code_list = [item.item_code for item in data]
+    batch_no_list1 = [batch.si_batch_no for batch in data]
+    batch_no_list = []
+    for i in batch_no_list1:
+    	if i != None:
+    		batch_no_list.append(i)
+    print(f"""\n\n\n batch_no_list ----- {batch_no_list}\n\n\n""")
+    
+    # print(f"""\n\n\n{item_code_list}\n\n\n""")
 
     data1 = frappe.db.sql(""" SELECT DISTINCT
      pii.item_code,pi.name as purchase_invoice,pi.company as company,pi.posting_date,
@@ -51,16 +59,17 @@ def get_data(filters):
      FROM `tabPurchase Invoice Item` pii
      JOIN `tabPurchase Invoice` pi  on pii.parent=pi.name 
      JOIN `tabSales Invoice` si  on pi.company=si.company 
-     where  pii.item_code in {0} and pi.posting_date < si.posting_date  and pi.company= '{1}'
+     where  pii.item_code in {0} and pii.batch_no in {1} and pi.posting_date < si.posting_date  and pi.company= '{2}'
      and pi.status not in ('Cancelled', 'Return','Draft','Debit Note Issued')
-     """.format(tuple(item_code_list),filters.get('company')),as_dict=1,debug=1)
+     """.format(tuple(item_code_list),tuple(batch_no_list),filters.get('company')),as_dict=1,debug=1)
 
     data2 = frappe.db.sql(""" SELECT DISTINCT 
         sri.parent as stock_voucher,sr.purpose as stock_purpose,sr.posting_date ,sri.item_code,
         sri.batch_no,sri.valuation_rate as valuation_rate,sri.qty
         FROM `tabStock Reconciliation Item`sri JOIN `tabStock Reconciliation`sr on sri.parent=sr.name  
         JOIN `tabSales Invoice` si  on sr.company=si.company
-        where sri.item_code in {0} and sr.company= '{1}' and sr.posting_date < si.posting_date """.format(tuple(item_code_list),filters.get('company')),as_dict=1,debug=1)
+        where sri.item_code in {0} and sri.batch_no in {1} and sr.company= '{2}' and sr.posting_date < si.posting_date """
+        .format(tuple(item_code_list),tuple(batch_no_list),filters.get('company')),as_dict=1,debug=1)
     
     data3 = frappe.db.sql(""" SELECT DISTINCT 
         pri.parent as purchase_receipt, pr.posting_date ,pr.company ,pri.item_code,
@@ -69,15 +78,15 @@ def get_data(filters):
         FROM `tabPurchase Receipt Item`pri
         JOIN `tabPurchase Receipt` pr on pr.name=pri.parent 
         JOIN `tabSales Invoice` si  on pr.company=si.company
-        where pri.item_code in {0} and pr.company= '{1}' and pr.posting_date < si.posting_date
-        """.format(tuple(item_code_list),filters.get('company')),as_dict=1,debug=1)
+        where pri.item_code in {0} and pri.batch_no in {1} and pr.company= '{2}' and pr.posting_date < si.posting_date
+        """.format(tuple(item_code_list),tuple(batch_no_list),filters.get('company')),as_dict=1,debug=1)
     
     data4= frappe.db.sql("""SELECT DISTINCT sed.basic_rate as stock_rate,
      sed.parent as manufacture,sed.parenttype ,se.stock_entry_type as stock_entry_type,se.company,sed.item_code
      FROM `tabStock Entry Detail`sed JOIN `tabStock Entry`se on se.name=sed.parent
      JOIN `tabSales Invoice` si  on se.company=si.company
-     where sed.item_code in {0} and se.company= '{1}' and se.posting_date < si.posting_date
-        """.format(tuple(item_code_list),filters.get('company')),as_dict=1,debug=1)
+     where sed.item_code in {0} and sed.batch_no in {1} and se.company= '{2}' and se.posting_date < si.posting_date
+        """.format(tuple(item_code_list),tuple(batch_no_list),filters.get('company')),as_dict=1,debug=1)
     
 
     #----------- get tax int value for PI starts-------------- 
