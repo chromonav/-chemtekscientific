@@ -45,9 +45,7 @@ def get_data(filters):
             for row1 in data1:
                 if row.get('contact_address') == row1.get('name'):
                     row.update(row1)
-        #print("Final Data==========",data)      
         data2= frappe.db.sql("""SELECT sales_person as sales_person_name,name,customer_name as customer_name from tabCustomer""",as_dict=1,debug=1)
-        #print("*************",data2)    
         add_list = []
         for i in address_list:
             if i != None:
