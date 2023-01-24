@@ -14,7 +14,7 @@ def get_data(filters):
             co.address as contact_address,CONCAT_WS(' ' ,co.first_name,co.last_name) as contact_person,
             co.creation as creation_date,co.status as contact_status,co.salutation as contact_salutation,
             co.designation as designation,co.department as department,co.mobile_no as mobile_no,co.phone as landline,co.email_id as email_id,             co.area_of_interest_2 as area_of_interest_2,co.hplc as hplc,co.uplc as uplc,co.gchs as gchs,co.gcms as gcms,             co.lcms as lcms,co.icp_ as icp,co._kfr as kfr,co.ic as ic,co.ph_ as ph,co.icpms as icpms,co.ftir_ as ftir,             co.dissolution as dissolution,co.malvern as malvern              FROM tabCustomer cu JOIN tabContact co ON cu.customer_name=co.company_name
-            WHERE co.first_name='{0}' OR co.status='{1}' AND where dl.link_doctype ="Customer" """.format(filters.get('first_name'),filters.get('status')),as_dict=1,debug=1)
+            WHERE co.first_name='{0}' OR co.status='{1}'  where dl.link_doctype ="Customer" """.format(filters.get('first_name'),filters.get('status')),as_dict=1,debug=1)
 
         address_list = [adrs.contact_address for adrs in data]
         
