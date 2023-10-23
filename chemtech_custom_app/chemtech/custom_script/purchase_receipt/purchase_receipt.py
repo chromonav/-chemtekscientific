@@ -5,3 +5,4 @@ def validate_supplier_delivery_note(doc, method=None):
         data = frappe.get_value("Purchase Receipt", {'supplier_delivery_note' : doc.supplier_delivery_note, 'supplier' : doc.supplier}, ['name'])
         if data:    
             frappe.throw('Supplier sales invoice number already exits')
+            
