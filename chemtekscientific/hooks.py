@@ -96,13 +96,14 @@ fixtures = ["Client Script"]
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
-#	"*": {
-#		"on_update": "method",
-#		"on_cancel": "method",
-#		"on_trash": "method"
-#	}
-# }
+doc_events = {
+	"Purchase Receipt": {
+		"before_insert": "chemtekscientific.chemtekscientific.custom_script.purchase_receipt.purchase_receipt.validate_supplier_delivery_note"
+	},
+	"Purchase Invoice":{
+		"before_insert": "chemtekscientific.chemtekscientific.custom_script.purchase_invoice.purchase_invoice.validate_bill_no"
+	}
+}
 
 # Scheduled Tasks
 # ---------------
