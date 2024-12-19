@@ -181,3 +181,8 @@ user_data_fields = [
 #	"chemtekscientific.auth.validate"
 # ]
 
+
+doctype_js = {"Supplier" : "public/supplier.js",
+              "Purchase Invoice" : "public/purchase_invoice.js"}
+
+doctype_list_js = {"Supplier" : "public/supplier_list.js"}
