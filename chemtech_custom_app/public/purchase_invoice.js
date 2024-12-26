@@ -1,6 +1,6 @@
 
 frappe.ui.form.on('Purchase Invoice', {
-    refresh: function(frm) {
+    on_save: function(frm) {
         $.each(frm.doc.items, function(index, item) {
             let exists = frm.doc.custom_additional_duties_and_charges.some(function(row) {
                 return row.item === item.item_name;
