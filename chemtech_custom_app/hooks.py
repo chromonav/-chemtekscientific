@@ -186,3 +186,8 @@ user_data_fields = [
 # Recommended only for DocTypes which have limited documents with untranslated names
 # For example: Role, Gender, etc.
 # translated_search_doctypes = []
+
+doctype_js = {"Supplier" : "public/supplier.js",
+              "Purchase Invoice" : "public/purchase_invoice.js"}
+
+doctype_list_js = {"Supplier" : "public/supplier_list.js"}
