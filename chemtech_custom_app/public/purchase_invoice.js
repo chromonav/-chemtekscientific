@@ -39,4 +39,5 @@ frappe.ui.form.on('Purchase Invoice', {
         // Set the calculated total in a new or existing field
         frm.set_value('custom_total_with_others_charges',final_total); // Store the additional charges total
     }
+    
 });
