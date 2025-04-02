@@ -34,6 +34,64 @@ def get_columns():
         {"label": "Invoice Status", "fieldname": "invoice_status", "fieldtype": "HTML", "width": 150},
     ]
 
+# def get_data(filters):
+#     conditions = ""
+#     if filters.get("start_date") and filters.get("end_date"):
+#         conditions += " AND q.transaction_date BETWEEN %(start_date)s AND %(end_date)s "
+    
+#     query = """
+#     SELECT 
+#         q.name AS quotation,
+#         q.transaction_date AS qt_date,
+#         q.customer_name,
+#         CASE q.status
+#             WHEN 'Draft' THEN '<span style="color: #808080">' || q.status || '</span>'
+#             WHEN 'Submitted' THEN '<span style="color: #0000FF">' || q.status || '</span>'
+#             WHEN 'Cancelled' THEN '<span style="color: #FF0000">' || q.status || '</span>'
+#             WHEN 'Ordered' THEN '<span style="color: #008000">' || q.status || '</span>'
+#             ELSE q.status
+#         END AS quotation_status,
+#         so.name AS sales_order,
+#         so.transaction_date AS so_date,
+#         CONCAT(
+#             ROUND((SUM(CASE WHEN so.per_billed < 100 AND so.per_delivered = 100 THEN 1 ELSE 0 END) / COUNT(so.name)) * 100, 2), '%% | ',
+#             ROUND((SUM(CASE WHEN so.per_delivered < 100 THEN 1 ELSE 0 END) / COUNT(so.name)) * 100, 2), '%%'
+#         ) AS so_delivered_billed,
+#         CASE so.status
+#             WHEN 'Draft' THEN '<span style="color: #808080">' || so.status || '</span>'
+#             WHEN 'To Deliver and Bill' THEN '<span style="color: red">' || so.status || '</span>'
+#             WHEN 'Completed' THEN '<span style="color: #008000">' || so.status || '</span>'
+#             ELSE so.status
+#         END AS so_status,
+#         so.advance_paid AS so_adv_payment,
+#         pp.name AS production_plan,
+#         pp.posting_date AS pro_date,
+#         pp.status AS pp_status,
+#         wo.name AS work_order,
+#         wo.planned_start_date AS plan_date,
+#         dn.name AS delivery_note,
+#         dn.posting_date AS dn_date,
+#         si.name AS sales_invoice,
+#         si.posting_date AS si_date,
+#         si.status AS invoice_status
+#     FROM 
+#         `tabQuotation` AS q
+#         LEFT JOIN `tabSales Order Item` AS soi ON soi.prevdoc_docname = q.name
+#         LEFT JOIN `tabSales Order` AS so ON soi.parent = so.name
+#         LEFT JOIN `tabProduction Plan` AS pp ON pp.name = so.name
+#         LEFT JOIN `tabWork Order` AS wo ON wo.production_plan = pp.name
+#         LEFT JOIN `tabDelivery Note` AS dn ON dn.name = so.name
+#         LEFT JOIN `tabSales Invoice` AS si ON si.name = so.name
+#     WHERE 1=1 {conditions}
+#     GROUP BY q.name
+#     ORDER BY q.name;
+#     """.format(conditions=conditions)
+    
+#     return frappe.db.sql(query, filters, as_dict=True)
+
+
+
+
 def get_data(filters):
     conditions = ""
     if filters.get("start_date") and filters.get("end_date"):
@@ -66,30 +124,23 @@ def get_data(filters):
         so.advance_paid AS so_adv_payment,
         pp.name AS production_plan,
         pp.posting_date AS pro_date,
-        CASE pp.status
-            WHEN 'Draft' THEN '<span style="color: #808080">' || pp.status || '</span>'
-            WHEN 'Completed' THEN '<span style="color: #008000">' || pp.status || '</span>'
-            ELSE pp.status
-        END AS pp_status,
+        pp.status AS pp_status,
         wo.name AS work_order,
         wo.planned_start_date AS plan_date,
         dn.name AS delivery_note,
         dn.posting_date AS dn_date,
         si.name AS sales_invoice,
         si.posting_date AS si_date,
-        CASE si.status
-            WHEN 'Draft' THEN '<span style="color: #808080">' || si.status || '</span>'
-            WHEN 'Unpaid' THEN '<span style="color: #FFA500">' || si.status || '</span>'
-            WHEN 'Paid' THEN '<span style="color: #008000">' || si.status || '</span>'
-            ELSE si.status
-        END AS invoice_status
+        si.status AS invoice_status
     FROM 
         `tabQuotation` AS q
-        LEFT JOIN `tabSales Order` AS so ON so.name = q.name
-        LEFT JOIN `tabProduction Plan` AS pp ON pp.name = so.name
+        LEFT JOIN `tabSales Order Item` AS soi ON soi.prevdoc_docname = q.name
+        LEFT JOIN `tabSales Order` AS so ON soi.parent = so.name
+        LEFT JOIN `tabProduction Plan Item` AS ppi ON ppi.sales_order = so.name
+        LEFT JOIN `tabProduction Plan` AS pp ON pp.name = ppi.parent
         LEFT JOIN `tabWork Order` AS wo ON wo.production_plan = pp.name
         LEFT JOIN `tabDelivery Note` AS dn ON dn.name = so.name
-        LEFT JOIN `tabSales Invoice` AS si ON si.name = so.name
+		LEFT JOIN `tabSales Invoice` AS si ON si.name = so.name
     WHERE 1=1 {conditions}
     GROUP BY q.name
     ORDER BY q.name;
