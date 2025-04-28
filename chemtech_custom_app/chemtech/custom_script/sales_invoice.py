@@ -20,7 +20,6 @@ def before_save(doc, method):
 	if call == True:
 		get_invoice_item(doc, method)
 		
-
 import frappe
 from datetime import datetime, timedelta
 from frappe import _
@@ -29,6 +28,7 @@ from frappe import _
 def validate_sales_invoice(doc, method):
     customer = doc.customer
     today = datetime.today().date()  # Convert to date
+    message_shown = False  # Flag to track if the message has been shown
 
     # Query for all unpaid sales invoices for this customer that are past due
     sales_invoices = frappe.get_all('Sales Invoice', 
@@ -51,9 +51,10 @@ def validate_sales_invoice(doc, method):
                 
                 # Check if the customer has allowed sales invoice creation even if payment terms are exceeded
                 if not allow_sales_invoice_creation:
-                    frappe.throw(_("Cannot create a new sales invoice as the customer has overdue payments."))
+                    frappe.throw(_("Cannot create a new sales order as the customer has overdue payments."))
                 else:
-                    # Log the gap information
-                    frappe.msgprint(_("The customer has overdue payments, but invoice creation is allowed due to the setting in the customer record."))
-
+                    # Show the message only once for the customer
+                    if not message_shown:
+                        frappe.msgprint(_("The customer has overdue payments, but invoice creation is allowed by higher authority."))
+                        message_shown = True  # Set the flag to True after showing the message
 
