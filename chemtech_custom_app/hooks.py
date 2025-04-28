@@ -191,3 +191,11 @@ doctype_js = {"Supplier" : "public/supplier.js",
               "Purchase Invoice" : "public/purchase_invoice.js"}
 
 doctype_list_js = {"Supplier" : "public/supplier_list.js"}
+
+
+
+doc_events = {
+    "Sales Invoice": {
+        "validate": "chemtech_custom_app.chemtech.custom_script.sales_invoice.validate_sales_invoice"
+    }
+}
