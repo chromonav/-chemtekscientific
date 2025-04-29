@@ -51,7 +51,7 @@ def validate_sales_invoice(doc, method):
                 
                 # Check if the customer has allowed sales invoice creation even if payment terms are exceeded
                 if not allow_sales_invoice_creation:
-                    frappe.throw(_("Cannot create a new sales order as the customer has overdue payments."))
+                    frappe.throw(_("Cannot create a new sales Invoice as the customer has overdue payments."))
                 else:
                     # Show the message only once for the customer
                     if not message_shown:
