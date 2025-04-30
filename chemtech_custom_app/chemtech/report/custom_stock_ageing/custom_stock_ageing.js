@@ -16,7 +16,7 @@ frappe.query_reports["Custom Stock Ageing"] = {
 			label: __("As On Date"),
 			fieldtype: "Date",
 			default: frappe.datetime.get_today(),
-			reqd: 0,
+			reqd: 1,
 		},
 		{
 			fieldname: "warehouse_type",

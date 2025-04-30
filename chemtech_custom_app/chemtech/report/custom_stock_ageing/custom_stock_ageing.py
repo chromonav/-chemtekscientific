@@ -1,7 +1,7 @@
 
 from collections.abc import Iterator
 from operator import itemgetter
-
+from frappe.utils import nowdate
 import frappe
 from frappe import _
 from frappe.utils import cint, date_diff, flt
@@ -12,7 +12,8 @@ Filters = frappe._dict
 
 
 def execute(filters: Filters = None) -> tuple:
-	to_date = filters["to_date"]
+	to_date = filters.get("to_date") or nowdate()
+	filters["to_date"] = to_date
 	filters.ranges = [num.strip() for num in filters.range.split(",") if num.strip().isdigit()]
 	columns = get_columns(filters)
 
