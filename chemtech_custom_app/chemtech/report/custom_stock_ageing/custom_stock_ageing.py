@@ -12,23 +12,16 @@ Filters = frappe._dict
 
 
 def execute(filters: Filters = None) -> tuple:
-    to_date = filters["to_date"]
-    if not to_date:
-        to_date = frappe.utils.nowdate()  # Default to today's date if 'to_date' is empty
+	to_date = filters["to_date"]
+	filters.ranges = [num.strip() for num in filters.range.split(",") if num.strip().isdigit()]
+	columns = get_columns(filters)
 
-    # Ensure 'ranges' is set from the 'range' filter, if provided
-    if "range" in filters:
-        filters.ranges = [num.strip() for num in filters["range"].split(",") if num.strip().isdigit()]
-    
-    # Proceed with report generation logic
-    columns = get_columns(filters)
-    item_details = FIFOSlots(filters).generate()
-    data = format_report_data(filters, item_details, to_date)
+	item_details = FIFOSlots(filters).generate()
+	data = format_report_data(filters, item_details, to_date)
 
-    # Generate chart data for report
-    chart_data = get_chart_data(data, filters)
+	chart_data = get_chart_data(data, filters)
 
-    return columns, data, None, chart_data
+	return columns, data, None, chart_data
 
 
 
