@@ -12,11 +12,6 @@ Filters = frappe._dict
 
 
 def execute(filters: Filters = None) -> tuple:
-    # Ensure filters is not None and contains 'to_date' key
-    if not filters or "to_date" not in filters:
-        frappe.throw(_("The 'to_date' filter is required for this report."))
-
-    # Access 'to_date' and set a default if missing
     to_date = filters["to_date"]
     if not to_date:
         to_date = frappe.utils.nowdate()  # Default to today's date if 'to_date' is empty
