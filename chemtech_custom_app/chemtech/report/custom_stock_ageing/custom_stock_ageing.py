@@ -11,29 +11,30 @@ from erpnext.stock.doctype.serial_no.serial_no import get_serial_nos
 Filters = frappe._dict
 
 
-from collections.abc import Iterator
-from operator import itemgetter
-
-import frappe
-from frappe import _
-from frappe.utils import cint, date_diff, flt
-
-from erpnext.stock.doctype.serial_no.serial_no import get_serial_nos
-
-Filters = frappe._dict
-
-
 def execute(filters: Filters = None) -> tuple:
-	to_date = filters["to_date"]
-	filters.ranges = [num.strip() for num in filters.range.split(",") if num.strip().isdigit()]
-	columns = get_columns(filters)
+    # Ensure filters is not None and contains 'to_date' key
+    if not filters or "to_date" not in filters:
+        frappe.throw(_("The 'to_date' filter is required for this report."))
 
-	item_details = FIFOSlots(filters).generate()
-	data = format_report_data(filters, item_details, to_date)
+    # Access 'to_date' and set a default if missing
+    to_date = filters["to_date"]
+    if not to_date:
+        to_date = frappe.utils.nowdate()  # Default to today's date if 'to_date' is empty
 
-	chart_data = get_chart_data(data, filters)
+    # Ensure 'ranges' is set from the 'range' filter, if provided
+    if "range" in filters:
+        filters.ranges = [num.strip() for num in filters["range"].split(",") if num.strip().isdigit()]
+    
+    # Proceed with report generation logic
+    columns = get_columns(filters)
+    item_details = FIFOSlots(filters).generate()
+    data = format_report_data(filters, item_details, to_date)
 
-	return columns, data, None, chart_data
+    # Generate chart data for report
+    chart_data = get_chart_data(data, filters)
+
+    return columns, data, None, chart_data
+
 
 
 def get_last_purchase_rate(item_code):
