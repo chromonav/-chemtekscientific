@@ -11,12 +11,28 @@ from erpnext.stock.doctype.serial_no.serial_no import get_serial_nos
 Filters = frappe._dict
 
 
+# def execute(filters: Filters = None) -> tuple:
+# 	to_date = filters.get("to_date") or nowdate()
+# 	filters["to_date"] = to_date
+# 	filters.ranges = [num.strip() for num in filters.range.split(",") if num.strip().isdigit()]
+# 	columns = get_columns(filters)
+
+# 	item_details = FIFOSlots(filters).generate()
+# 	data = format_report_data(filters, item_details, to_date)
+
+# 	chart_data = get_chart_data(data, filters)
+
+# 	return columns, data, None, chart_data
 def execute(filters: Filters = None) -> tuple:
+	if not filters:
+		filters = frappe._dict()
+
 	to_date = filters.get("to_date") or nowdate()
 	filters["to_date"] = to_date
-	filters.ranges = [num.strip() for num in filters.range.split(",") if num.strip().isdigit()]
-	columns = get_columns(filters)
 
+	filters.ranges = [num.strip() for num in (filters.get("range") or "").split(",") if num.strip().isdigit()]
+
+	columns = get_columns(filters)
 	item_details = FIFOSlots(filters).generate()
 	data = format_report_data(filters, item_details, to_date)
 
