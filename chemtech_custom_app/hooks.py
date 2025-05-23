@@ -188,7 +188,9 @@ user_data_fields = [
 # translated_search_doctypes = []
 
 doctype_js = {"Supplier" : "public/supplier.js",
-              "Purchase Invoice" : "public/purchase_invoice.js"}
+              "Purchase Invoice" : "public/purchase_invoice.js",
+              "Batch":"public/batch.js"
+              }
 
 doctype_list_js = {"Supplier" : "public/supplier_list.js"}
 
