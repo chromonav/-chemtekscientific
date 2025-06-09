@@ -192,7 +192,7 @@ doctype_js = {"Supplier" : "public/supplier.js",
               "Batch":"public/batch.js"
               }
 
-doctype_list_js = {"Supplier" : "public/supplier_list.js"}
+# doctype_list_js = {"Supplier" : "public/supplier_list.js"}
 
 
 
