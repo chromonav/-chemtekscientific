@@ -189,7 +189,8 @@ user_data_fields = [
 
 doctype_js = {"Supplier" : "public/supplier.js",
               "Purchase Invoice" : "public/purchase_invoice.js",
-              "Batch":"public/batch.js"
+              "Batch":"public/batch.js",
+              "Delivery Note":"public/delivery_note.js"
               }
 
 # doctype_list_js = {"Supplier" : "public/supplier_list.js"}
