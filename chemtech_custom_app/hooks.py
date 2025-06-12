@@ -190,7 +190,7 @@ user_data_fields = [
 doctype_js = {"Supplier" : "public/supplier.js",
               "Purchase Invoice" : "public/purchase_invoice.js",
               "Batch":"public/batch.js",
-              "Delivery Note":"public/delivery_note.js"
+            #   "Delivery Note":"public/delivery_note.js"
               }
 
 # doctype_list_js = {"Supplier" : "public/supplier_list.js"}
@@ -200,5 +200,8 @@ doctype_js = {"Supplier" : "public/supplier.js",
 doc_events = {
     "Sales Invoice": {
         "validate": "chemtech_custom_app.chemtech.custom_script.sales_invoice.validate_sales_invoice"
+    },
+    "Delivery Note": {
+        "validate": "chemtech_custom_app.chemtech.custom_script.delivery_note.validate_delivery_note"
     }
 }
