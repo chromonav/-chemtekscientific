@@ -6,6 +6,13 @@ from frappe.model.document import Document
 
 
 class SalespersonForecast(Document):
+	# def validate(self):
+	# 	seen = set()
+	# 	for row in self.item_sales_qty:
+	# 		if row.item in seen:
+	# 			frappe.throw(f"Duplicate Item '{row.item}' is not allowed.")
+	# 		seen.add(row.item)
+
 	def validate(self):
 		seen = set()
 		for row in self.item_sales_qty:
