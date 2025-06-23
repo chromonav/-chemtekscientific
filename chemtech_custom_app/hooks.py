@@ -205,3 +205,10 @@ doc_events = {
         "validate": "chemtech_custom_app.chemtech.custom_script.delivery_note.validate_delivery_note"
     }
 }
+
+
+whitelisted_methods = {
+    "chemtech_custom_app.chemtech.custom_script.stock_order_planning.get_item_stock_data": "chemtech_custom_app.chemtech.custom_script.stock_order_planning.get_item_stock_data",
+    "chemtech_custom_app.chemtech.custom_script.must_stock.get_all_item_data": "chemtech_custom_app.chemtech.custom_script.must_stock.get_all_item_data"
+
+}
