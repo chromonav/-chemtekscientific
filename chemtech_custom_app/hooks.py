@@ -207,6 +207,10 @@ doc_events = {
     "Customer": {
         "after_insert": "chemtech_custom_app.chemtech.custom_script.salesforce_customer_sync.sync_customer_to_salesforce",
         "on_update": "chemtech_custom_app.chemtech.custom_script.salesforce_customer_sync.sync_customer_to_salesforce"
+    },
+    "Item": {
+        "after_insert": "chemtech_custom_app.chemtech.custom_script.salesforce_item_sync.sync_item_to_salesforce",
+        "on_update": "chemtech_custom_app.chemtech.custom_script.salesforce_item_sync.sync_item_to_salesforce"
     }
 }
 
