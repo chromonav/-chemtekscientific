@@ -2,7 +2,7 @@ import frappe
 
 
 @frappe.whitelist(methods=["POST"])
-def upsert_item(item_code=None, item_name=None, hsn_sac=None, pack=None, sub_category=None, uom=None, name=None):
+def upsert_item(item_code=None, item_name=None, hsn_sac=None, pack=None, sub_category=None, uom=None, cas_number=None, name=None):
     """
     Create or update an Item.
     If `name` is provided, update the existing Item with that name.
@@ -23,6 +23,8 @@ def upsert_item(item_code=None, item_name=None, hsn_sac=None, pack=None, sub_cat
             doc.pack = pack
         if sub_category is not None:
             doc.custom_sub_category = sub_category
+        if cas_number is not None:
+            doc.cas_number = cas_number
         doc.flags.ignore_salesforce_sync = True
         doc.save(ignore_permissions=True)
     else:
@@ -37,6 +39,7 @@ def upsert_item(item_code=None, item_name=None, hsn_sac=None, pack=None, sub_cat
             "gst_hsn_code": hsn_sac or "",
             "pack": pack or "",
             "custom_sub_category": sub_category or "",
+            "cas_number": cas_number or "",
         })
         doc.flags.ignore_salesforce_sync = True
         doc.insert(ignore_permissions=True)
