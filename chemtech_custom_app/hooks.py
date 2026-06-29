@@ -203,6 +203,10 @@ doc_events = {
     },
     "Delivery Note": {
         "validate": "chemtech_custom_app.chemtech.custom_script.delivery_note.validate_delivery_note"
+    },
+    "Customer": {
+        "after_insert": "chemtech_custom_app.chemtech.custom_script.salesforce_customer_sync.sync_customer_to_salesforce",
+        "on_update": "chemtech_custom_app.chemtech.custom_script.salesforce_customer_sync.sync_customer_to_salesforce"
     }
 }
 
