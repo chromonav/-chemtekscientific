@@ -203,12 +203,20 @@ doc_events = {
     },
     "Delivery Note": {
         "validate": "chemtech_custom_app.chemtech.custom_script.delivery_note.validate_delivery_note"
+    },
+    "Customer": {
+        "after_insert": "chemtech_custom_app.chemtech.custom_script.salesforce_customer_sync.sync_customer_to_salesforce",
+        "on_update": "chemtech_custom_app.chemtech.custom_script.salesforce_customer_sync.sync_customer_to_salesforce"
+    },
+    "Item": {
+        "after_insert": "chemtech_custom_app.chemtech.custom_script.salesforce_item_sync.sync_item_to_salesforce",
+        "on_update": "chemtech_custom_app.chemtech.custom_script.salesforce_item_sync.sync_item_to_salesforce"
     }
 }
 
 
 whitelisted_methods = {
     "chemtech_custom_app.chemtech.custom_script.stock_order_planning.get_item_stock_data": "chemtech_custom_app.chemtech.custom_script.stock_order_planning.get_item_stock_data",
-    "chemtech_custom_app.chemtech.custom_script.must_stock.get_all_item_data": "chemtech_custom_app.chemtech.custom_script.must_stock.get_all_item_data"
-
+    "chemtech_custom_app.chemtech.custom_script.must_stock.get_all_item_data": "chemtech_custom_app.chemtech.custom_script.must_stock.get_all_item_data",
+    "chemtech_custom_app.chemtech.api.item_api.upsert_item": "chemtech_custom_app.chemtech.api.item_api.upsert_item"
 }
