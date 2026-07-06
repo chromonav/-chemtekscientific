@@ -87,6 +87,9 @@ def _build_account_record(doc):
 
 def sync_customer_to_salesforce(doc, method=None):
     """Push a Customer record to the Salesforce Account endpoint."""
+    if doc.flags.get("ignore_salesforce_sync"):
+        return
+
     from chemtech_custom_app.chemtech.doctype.salesforce_setting.salesforce_setting import (
         get_valid_access_token,
     )

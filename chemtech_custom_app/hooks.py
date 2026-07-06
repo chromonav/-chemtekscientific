@@ -218,5 +218,6 @@ doc_events = {
 whitelisted_methods = {
     "chemtech_custom_app.chemtech.custom_script.stock_order_planning.get_item_stock_data": "chemtech_custom_app.chemtech.custom_script.stock_order_planning.get_item_stock_data",
     "chemtech_custom_app.chemtech.custom_script.must_stock.get_all_item_data": "chemtech_custom_app.chemtech.custom_script.must_stock.get_all_item_data",
-    "chemtech_custom_app.chemtech.api.item_api.upsert_item": "chemtech_custom_app.chemtech.api.item_api.upsert_item"
+    "chemtech_custom_app.chemtech.api.item_api.upsert_item": "chemtech_custom_app.chemtech.api.item_api.upsert_item",
+    "chemtech_custom_app.chemtech.api.customer_api.upsert_customer": "chemtech_custom_app.chemtech.api.customer_api.upsert_customer"
 }
