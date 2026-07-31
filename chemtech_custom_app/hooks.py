@@ -195,6 +195,24 @@ doctype_js = {"Supplier" : "public/supplier.js",
 
 # doctype_list_js = {"Supplier" : "public/supplier_list.js"}
 
+# Fixtures
+# --------
+
+fixtures = [
+    {
+        "dt": "Custom Field",
+        "filters": [
+            [
+                "name",
+                "in",
+                [
+                    "Purchase Order Item-custom_cas_no",
+                ],
+            ]
+        ],
+    }
+]
+
 
 
 doc_events = {
