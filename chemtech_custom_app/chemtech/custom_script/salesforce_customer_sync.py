@@ -66,7 +66,7 @@ def _get_shipping_address(customer_name):
 def _build_account_record(doc):
     record = {
         "Name": doc.customer_name or "",
-        "SF_Cust_Code__c": doc.get("sf_cust_code") or "",
+        "SF_Cust_Code__c": doc.get("account_code") or "",
         "Phone": doc.mobile_no or "",
         "Fax": doc.get("fax") or "",
         "Website": doc.website or "",
