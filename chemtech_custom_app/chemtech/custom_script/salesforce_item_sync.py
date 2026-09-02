@@ -2,6 +2,28 @@ import frappe
 import requests
 
 
+def _get_gst_rate(doc):
+    """GST rate from the first row of the Item's tax table, as a plain number.
+
+    Only the first `taxes` row is considered, no matter how many are present.
+    Returns None when there is no row, no template, or no rate on the template.
+    """
+    taxes = doc.get("taxes") or []
+    if not taxes:
+        return None
+
+    template = taxes[0].get("item_tax_template")
+    if not template:
+        return None
+
+    rate = frappe.db.get_value("Item Tax Template", template, "gst_rate")
+    if rate in (None, ""):
+        return None
+
+    rate = float(rate)
+    return int(rate) if rate.is_integer() else rate
+
+
 def _build_product_record(doc):
     return {
         "Name": doc.item_name,
@@ -15,6 +37,7 @@ def _build_product_record(doc):
         "CAS_Number__c": doc.get("cas_number") or "",
         "Brand__c": doc.brand or "",
         "Sub_Category__c": doc.get("custom_sub_category") or "",
+        "GST__c": _get_gst_rate(doc),
     }
 
 
