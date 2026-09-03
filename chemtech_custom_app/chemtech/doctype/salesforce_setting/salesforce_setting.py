@@ -16,11 +16,15 @@ def _fetch_new_token():
 
 	doc = frappe.get_single("Salesforce Setting")
 
+	# client_secret is a Password field: the plain attribute holds only the
+	# asterisk mask, the real value lives encrypted in __Auth.
+	client_secret = doc.get_password("client_secret", raise_exception=False)
+
 	if not doc.salesforce_url:
 		frappe.throw("Salesforce URL is not set.")
 	if not doc.client_id:
 		frappe.throw("Client ID is not set.")
-	if not doc.client_secret:
+	if not client_secret:
 		frappe.throw("Client Secret is not set.")
 
 	url = doc.salesforce_url.rstrip("/") + "/services/oauth2/token"
@@ -30,7 +34,7 @@ def _fetch_new_token():
 		params={
 			"grant_type": "client_credentials",
 			"client_id": doc.client_id,
-			"client_secret": doc.client_secret,
+			"client_secret": client_secret,
 		},
 		timeout=30,
 	)

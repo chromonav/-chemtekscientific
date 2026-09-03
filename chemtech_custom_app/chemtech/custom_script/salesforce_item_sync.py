@@ -38,6 +38,11 @@ def _build_product_record(doc):
         "Brand__c": doc.brand or "",
         "Sub_Category__c": doc.get("custom_sub_category") or "",
         "GST__c": _get_gst_rate(doc),
+        # Restricted picklists on Product2: an unset value has to go as null,
+        # since "" is not one of the allowed entries.
+        "Record_Type__c": doc.get("custom_product_group") or None,
+        "Warehouse__c": doc.get("custom_warehouse") or None,
+        "Balance_Qty__c": int(doc.get("custom_balance_quantity") or 0),
     }
 
 

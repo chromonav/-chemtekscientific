@@ -229,7 +229,18 @@ doc_events = {
     "Item": {
         "after_insert": "chemtech_custom_app.chemtech.custom_script.salesforce_item_sync.sync_item_to_salesforce",
         "on_update": "chemtech_custom_app.chemtech.custom_script.salesforce_item_sync.sync_item_to_salesforce"
+    },
+    "Pricebook": {
+        "after_insert": "chemtech_custom_app.chemtech.custom_script.salesforce_pricebook_sync.sync_pricebook_to_salesforce",
+        "on_update": "chemtech_custom_app.chemtech.custom_script.salesforce_pricebook_sync.sync_pricebook_to_salesforce"
     }
+}
+
+
+scheduler_events = {
+    "hourly": [
+        "chemtech_custom_app.chemtech.custom_script.scheduler_events.item.update_balance_quantity"
+    ]
 }
 
 
