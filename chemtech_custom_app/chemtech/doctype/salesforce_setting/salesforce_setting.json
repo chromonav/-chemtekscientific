@@ -27,7 +27,7 @@
   },
   {
    "fieldname": "client_secret",
-   "fieldtype": "Data",
+   "fieldtype": "Password",
    "label": "Client Secret",
    "reqd": 1
   },
