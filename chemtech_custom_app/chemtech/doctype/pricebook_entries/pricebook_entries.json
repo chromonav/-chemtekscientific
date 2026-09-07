@@ -1,13 +1,15 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2026-08-31 10:00:00.000000",
+ "creation": "2026-08-31 10:00:00",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
   "product_code",
-  "rate",
+  "product_name",
+  "list_price",
+  "selling_price",
   "is_active"
  ],
  "fields": [
@@ -21,30 +23,40 @@
    "reqd": 1
   },
   {
-   "description": "Sent to Salesforce as UnitPrice.",
-   "fieldname": "rate",
-   "fieldtype": "Currency",
-   "in_list_view": 1,
-   "label": "Rate",
-   "reqd": 1
-  },
-  {
    "default": "1",
    "fieldname": "is_active",
    "fieldtype": "Check",
    "in_list_view": 1,
    "label": "Is Active"
+  },
+  {
+   "fieldname": "selling_price",
+   "fieldtype": "Currency",
+   "label": "Selling Price"
+  },
+  {
+   "fieldname": "list_price",
+   "fieldtype": "Currency",
+   "label": "List Price",
+   "reqd": 1
+  },
+  {
+   "fetch_from": "product_code.item_name",
+   "fieldname": "product_name",
+   "fieldtype": "Data",
+   "label": "Product Name"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2026-08-31 10:00:00.000000",
+ "modified": "2026-09-07 16:30:41.485775",
  "modified_by": "Administrator",
  "module": "ChemTech",
  "name": "Pricebook Entries",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

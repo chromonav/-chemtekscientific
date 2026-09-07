@@ -50,7 +50,10 @@ def sync_item_to_salesforce(doc, method=None):
     """Push an Item record to the Salesforce Product2 endpoint."""
     if doc.flags.get("ignore_salesforce_sync"):
         return
-
+    # Do not sync NPD products to Salesforce
+    if doc.get("custom_product_group") == "NPD":
+        return
+    
     from chemtech_custom_app.chemtech.doctype.salesforce_setting.salesforce_setting import (
         get_valid_access_token,
     )

@@ -2,86 +2,86 @@ import frappe
 import requests
 
 
-def _get_billing_address(customer_name):
-    """Return billing address fields for the customer, or empty strings."""
-    address_name = frappe.db.get_value(
+ADDRESS_FIELDS = ["address_line1", "address_line2", "city", "pincode", "state", "country"]
+
+
+def _linked_addresses(customer_name):
+    """Every Address linked to the customer, oldest first."""
+    return frappe.get_all(
         "Dynamic Link",
-        {"link_doctype": "Customer", "link_name": customer_name, "parenttype": "Address"},
-        "parent",
+        filters={
+            "link_doctype": "Customer",
+            "link_name": customer_name,
+            "parenttype": "Address",
+        },
+        pluck="parent",
         order_by="creation asc",
     )
-    if not address_name:
-        return {}
 
-    addr = frappe.db.get_value(
-        "Address",
-        address_name,
-        ["address_line1", "city", "pincode", "state", "country"],
-        as_dict=True,
+
+def _pick_address(customer_name, address_type):
+    """The address of the given type, falling back to the oldest linked one.
+
+    Addresses written by the Salesforce API are typed Billing/Shipping, but
+    older records were created by hand and may carry any type, so a customer
+    with a single untyped address still syncs something useful.
+    """
+    linked = _linked_addresses(customer_name)
+    if not linked:
+        return None
+
+    typed = frappe.db.get_value(
+        "Address", {"name": ["in", linked], "address_type": address_type}, "name"
     )
-    if not addr:
-        return {}
-
-    return {
-        "BillingStreet": addr.address_line1 or "",
-        "BillingCity": addr.city or "",
-        "BillingPostalCode": addr.pincode or "",
-        "BillingState": addr.state or "",
-        "BillingCountry": addr.country or "",
-    }
+    return typed or linked[0]
 
 
-def _get_shipping_address(customer_name):
-    """Return shipping address fields for the customer, or empty strings."""
-    address_names = frappe.db.get_all(
-        "Dynamic Link",
-        filters={"link_doctype": "Customer", "link_name": customer_name, "parenttype": "Address"},
-        fields=["parent"],
-        order_by="creation asc",
-        limit=2,
-    )
-    # Use second address as shipping if available, otherwise same as billing
-    name = address_names[1].parent if len(address_names) > 1 else (address_names[0].parent if address_names else None)
+def _address_values(customer_name, address_type, prefix):
+    name = _pick_address(customer_name, address_type)
     if not name:
         return {}
 
-    addr = frappe.db.get_value(
-        "Address",
-        name,
-        ["address_line1", "city", "pincode", "state", "country"],
-        as_dict=True,
-    )
+    addr = frappe.db.get_value("Address", name, ADDRESS_FIELDS, as_dict=True)
     if not addr:
         return {}
 
+    # Salesforce keeps the street as one textarea, so both ERPNext lines go in
+    # separated by a newline -- otherwise address_line2 is lost on the way out.
+    street = "\n".join(filter(None, [addr.address_line1, addr.address_line2]))
+
     return {
-        "ShippingStreet": addr.address_line1 or "",
-        "ShippingCity": addr.city or "",
-        "ShippingPostalCode": addr.pincode or "",
-        "ShippingState": addr.state or "",
-        "ShippingCountry": addr.country or "",
+        f"{prefix}Street": street,
+        f"{prefix}City": addr.city or "",
+        f"{prefix}PostalCode": addr.pincode or "",
+        f"{prefix}State": addr.state or "",
+        f"{prefix}Country": addr.country or "",
     }
 
 
 def _build_account_record(doc):
     record = {
         "Name": doc.customer_name or "",
-        "SF_Cust_Code__c": doc.get("account_code") or "",
+        # ERP_Cust_Code__c carries the account code we generate. SF_Cust_Code__c
+        # is Salesforce's own code and is not createable, so it is never sent.
+        "ERP_Cust_Code__c": doc.get("account_code") or "",
         "Phone": doc.mobile_no or "",
-        "Fax": doc.get("fax") or "",
+        "Fax": doc.get("custom_fax") or "",
         "Website": doc.website or "",
-        "ERP_Cust_Code__c": doc.name or "",
         "GST_Category__c": doc.get("gst_category") or "",
         "GSTIN_UIN__c": doc.get("gstin") or doc.tax_id or "",
         "PAN_No__c": doc.get("pan") or "",
-        "Account_Type__c": doc.get("account_type") or "",
-        "Customer_Type__c": doc.customer_type or "",
-        "Payment_Terms__c": doc.payment_terms or "",
+        "Territory__c": doc.get("territory") or "",
         "Industry": doc.industry or "",
         "Description": doc.get("customer_details") or "",
+        # Restricted picklists: an unset value has to go as null, since "" is
+        # not one of the allowed entries.
+        "Account_Type__c": doc.get("custom_account_type") or None,
+        "Customer_Type__c": doc.customer_type or None,
+        "Customer_Group__c": doc.get("customer_group") or None,
+        "Payment_Terms__c": doc.payment_terms or None,
     }
-    record.update(_get_billing_address(doc.name))
-    record.update(_get_shipping_address(doc.name))
+    record.update(_address_values(doc.name, "Billing", "Billing"))
+    record.update(_address_values(doc.name, "Shipping", "Shipping"))
     return record
 
 

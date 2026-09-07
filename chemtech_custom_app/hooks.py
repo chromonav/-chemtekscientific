@@ -223,6 +223,7 @@ doc_events = {
         "validate": "chemtech_custom_app.chemtech.custom_script.delivery_note.validate_delivery_note"
     },
     "Customer": {
+        "validate": "chemtech_custom_app.chemtech.custom_script.customer.set_account_code",
         "after_insert": "chemtech_custom_app.chemtech.custom_script.salesforce_customer_sync.sync_customer_to_salesforce",
         "on_update": "chemtech_custom_app.chemtech.custom_script.salesforce_customer_sync.sync_customer_to_salesforce"
     },
@@ -233,9 +234,6 @@ doc_events = {
     "Pricebook": {
         "after_insert": "chemtech_custom_app.chemtech.custom_script.salesforce_pricebook_sync.sync_pricebook_to_salesforce",
         "on_update": "chemtech_custom_app.chemtech.custom_script.salesforce_pricebook_sync.sync_pricebook_to_salesforce"
-    },
-    "Customer": {
-        "validate": "chemtech_custom_app.chemtech.custom_script.customer.set_account_code"
     }
 }
 
