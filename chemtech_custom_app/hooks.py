@@ -190,7 +190,8 @@ user_data_fields = [
 doctype_js = {"Supplier" : "public/supplier.js",
               "Purchase Invoice" : "public/purchase_invoice.js",
               "Batch":"public/batch.js",
-            #   "Delivery Note":"public/delivery_note.js"
+              "Item":"public/item.js",
+              "Customer":"public/customer.js",
               }
 
 # doctype_list_js = {"Supplier" : "public/supplier_list.js"}
@@ -223,18 +224,8 @@ doc_events = {
         "validate": "chemtech_custom_app.chemtech.custom_script.delivery_note.validate_delivery_note"
     },
     "Customer": {
-        "validate": "chemtech_custom_app.chemtech.custom_script.customer.set_account_code",
-        "after_insert": "chemtech_custom_app.chemtech.custom_script.salesforce_customer_sync.sync_customer_to_salesforce",
-        "on_update": "chemtech_custom_app.chemtech.custom_script.salesforce_customer_sync.sync_customer_to_salesforce"
+        "validate": "chemtech_custom_app.chemtech.custom_script.customer.set_account_code"
     },
-    "Item": {
-        "after_insert": "chemtech_custom_app.chemtech.custom_script.salesforce_item_sync.sync_item_to_salesforce",
-        "on_update": "chemtech_custom_app.chemtech.custom_script.salesforce_item_sync.sync_item_to_salesforce"
-    },
-    "Pricebook": {
-        "after_insert": "chemtech_custom_app.chemtech.custom_script.salesforce_pricebook_sync.sync_pricebook_to_salesforce",
-        "on_update": "chemtech_custom_app.chemtech.custom_script.salesforce_pricebook_sync.sync_pricebook_to_salesforce"
-    }
 }
 
 

@@ -12,7 +12,7 @@ def _build_entry_record(row):
     """
     return {
         "ProductCode": row.product_code or "",
-        "UnitPrice": float(row.rate or 0),
+        "UnitPrice": float(row.list_price or 0),
         "IsActive": bool(row.is_active),
     }
 
