@@ -81,14 +81,26 @@ def sync_item_to_salesforce(doc, method=None):
                 message=f"Status {response.status_code}: {response.text}",
                 title=f"Salesforce Sync Failed | Item: {doc.name}",
             )
-        else:
-            frappe.log_error(
-                message=f"Payload: {frappe.as_json(payload)}\n\nResponse: {response.text}",
-                title=f"Salesforce Sync Success | Item: {doc.name}",
-            )
+            return {"success": False, "error": f"Status {response.status_code}: {response.text}"}
 
-    except Exception:
+        frappe.log_error(
+            message=f"Payload: {frappe.as_json(payload)}\n\nResponse: {response.text}",
+            title=f"Salesforce Sync Success | Item: {doc.name}",
+        )
+        return {"success": True, "response": response.text}
+
+    except Exception as e:
         frappe.log_error(
             frappe.get_traceback(),
             title=f"Salesforce Sync Error | Item: {doc.name}",
         )
+        return {"success": False, "error": str(e)}
+
+
+@frappe.whitelist()
+def sync_item(name):
+    """Push one item on demand -- the form's "Sync to Salesforce" button."""
+    doc = frappe.get_doc("Item", name)
+    doc.check_permission("read")
+
+    return sync_item_to_salesforce(doc)
