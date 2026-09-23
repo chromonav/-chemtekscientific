@@ -30,6 +30,7 @@ def _build_product_record(doc):
         "Description": doc.description or "",
         "ProductCode": doc.name,
         "IsActive": not bool(doc.disabled),
+        "Disable__c": doc.disabled,
         "UOM__c": doc.stock_uom or "",
         "Pack__c": str(doc.get("pack") or ""),
         "HSN_SAC__c": doc.get("gst_hsn_code") or "",
@@ -43,6 +44,7 @@ def _build_product_record(doc):
         "Record_Type__c": doc.get("custom_product_group") or None,
         "Warehouse__c": doc.get("custom_warehouse") or None,
         "Balance_Qty__c": int(doc.get("custom_balance_quantity") or 0),
+        "Raw_Material_Price__c": int(doc.get("custom_raw_material_price") or 0)
     }
 
 

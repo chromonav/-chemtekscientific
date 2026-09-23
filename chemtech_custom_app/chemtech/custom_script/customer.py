@@ -10,18 +10,52 @@ def _holder_of(code, exclude=None):
 
 
 def generate_account_code(customer_name, city, exclude=None):
-    """First three letters of the name plus the city.
+    """Generate account code based on customer name and city.
 
-    Exactly one customer may hold a given code -- Salesforce stores it as its
-    handle on the ERPNext customer, so a clash is rejected rather than worked
-    around with a numeric suffix.
+    Customer name rules:
+    1. 3 or more words:
+       - First letter of first 3 words.
+       - Ignore the 4th and subsequent words.
+       Example: "ABC Trading Private Limited" -> ATP
+
+    2. 2 words:
+       - First 2 letters of first word.
+       - First 1 letter of second word.
+       Example: "ABC Traders" -> ABT
+
+    3. 1 word:
+       - First 3 letters of the word.
+       Example: "ABC" -> ABC
     """
-    # Strip anything non-alphanumeric first: "3p Instrument" must not yield a
-    # code with a space in it, since Salesforce stores this as a key.
-    name_part = "".join(c for c in (customer_name or "") if c.isalnum())
+
+    # Split customer name into words and remove non-alphanumeric
+    # characters from each word.
+    words = [
+        "".join(c for c in word if c.isalnum())
+        for word in (customer_name or "").split()
+    ]
+    words = [word for word in words if word]
+
+    if len(words) >= 3:
+        # First letter from first three words
+        name_part = "".join(word[0] for word in words[:3])
+
+    elif len(words) == 2:
+        # First 2 letters from first word + first letter from second word
+        name_part = words[0][:2] + words[1][:1]
+
+    elif len(words) == 1:
+        # First 3 letters from the only word
+        name_part = words[0][:3]
+
+    else:
+        name_part = ""
+
+    # First 3 letters of city
     city_part = "".join(c for c in (city or "") if c.isalnum())
 
     code = (name_part[:3] + city_part[:3]).upper()
+
     if not code:
         frappe.throw(
             "Cannot build an account code without a customer name or city.",
