@@ -218,7 +218,11 @@ fixtures = [
 
 doc_events = {
     "Sales Invoice": {
-        "validate": "chemtech_custom_app.chemtech.custom_script.sales_invoice.validate_sales_invoice"
+        "validate": [
+            "chemtech_custom_app.chemtech.custom_script.sales_invoice.validate_sales_invoice",
+            "chemtech_custom_app.chemtech.custom_script.inter_company.validate_inter_company_transfer",
+        ],
+        "on_submit": "chemtech_custom_app.chemtech.custom_script.inter_company.make_purchase_invoice_for_internal_customer",
     },
     "Delivery Note": {
         "validate": "chemtech_custom_app.chemtech.custom_script.delivery_note.validate_delivery_note"
