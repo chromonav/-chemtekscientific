@@ -67,6 +67,7 @@ def _build_account_record(doc):
         "Phone": doc.mobile_no or "",
         "Fax": doc.get("custom_fax") or "",
         "Website": doc.website or "",
+        "Disabled__c": bool(doc.get("disabled")),
         "GST_Category__c": doc.get("gst_category") or "",
         "GSTIN_UIN__c": doc.get("gstin") or doc.tax_id or "",
         "PAN_No__c": doc.get("pan") or "",

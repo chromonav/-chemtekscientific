@@ -1,5 +1,9 @@
 frappe.ui.form.on('Purchase Invoice', {
     refresh: function(frm) {
+        if (frm.doc.docstatus !== 0) {
+            return;
+        }
+
         // Ensure rows in custom_additional_duties_and_charges match items
         $.each(frm.doc.items, function(index, item) {
             let exists = frm.doc.custom_additional_duties_and_charges.some(function(row) {
@@ -8,10 +12,10 @@ frappe.ui.form.on('Purchase Invoice', {
 
             if (!exists) {
                 let row = frm.add_child("custom_additional_duties_and_charges");
-                row.item_code = item.item_code;  
-                row.duty_charges = 0;  
-                row.freight_charges = 0;  
-                row.other_charges = 0;  
+                row.item_code = item.item_code;
+                row.duty_charges = 0;
+                row.freight_charges = 0;
+                row.other_charges = 0;
             }
         });
 
