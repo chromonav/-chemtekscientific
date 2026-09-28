@@ -30,7 +30,7 @@ def _build_product_record(doc):
         "Description": doc.description or "",
         "ProductCode": doc.name,
         "IsActive": not bool(doc.disabled),
-        "Disable__c": doc.disabled,
+        "Disable__c": bool(doc.disabled),
         "UOM__c": doc.stock_uom or "",
         "Pack__c": str(doc.get("pack") or ""),
         "HSN_SAC__c": doc.get("gst_hsn_code") or "",
