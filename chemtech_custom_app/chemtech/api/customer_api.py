@@ -135,6 +135,7 @@ def upsert_customer(
     customer_type=None,
     customer_group=None,
     territory=None,
+    disabled=None,
     gst_category=None,
     gstin=None,
     account_type=None,
@@ -220,6 +221,9 @@ def upsert_customer(
             "customer_details": customer_details,
             "custom_fax": fax,
         }
+        if disabled is not None:
+            optional["disabled"] = frappe.utils.cint(disabled)
+
         for fieldname, value in optional.items():
             if value is not None:
                 doc.set(fieldname, value)

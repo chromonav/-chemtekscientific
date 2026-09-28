@@ -47,8 +47,10 @@ def make_purchase_invoice_for_internal_customer(doc, method=None):
 
 	purchase_invoice.bill_no= doc.name
 	purchase_invoice.bill_date= doc.posting_date
+	purchase_invoice.custom_purchase_type= "Operational Purchase"
 
-	purchase_invoice.insert(ignore_permissions=True, ignore_mandatory=True)
+	purchase_invoice.insert(ignore_permissions=True)
+	purchase_invoice.submit()
 
 	frappe.db.set_value(
 		"Sales Invoice", doc.name, "inter_company_invoice_reference", purchase_invoice.name
@@ -56,7 +58,7 @@ def make_purchase_invoice_for_internal_customer(doc, method=None):
 	doc.inter_company_invoice_reference = purchase_invoice.name
 
 	frappe.msgprint(
-		f"Draft Purchase Invoice {purchase_invoice.name} auto-created for "
+		f"Submitted Purchase Invoice {purchase_invoice.name} auto-created for "
 		f"company {purchase_invoice.company} against Supplier {purchase_invoice.supplier}.",
 		alert=True,
 	)
