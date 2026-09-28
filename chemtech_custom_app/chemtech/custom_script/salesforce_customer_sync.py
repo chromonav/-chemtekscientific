@@ -119,6 +119,17 @@ def sync_customer_to_salesforce(doc, method=None):
             )
             return {"success": False, "error": f"Status {response.status_code}: {response.text}"}
 
+        result = response.json()
+        sf_cust_code = None
+        for record in result.get("results", []):
+            if record.get("sfCustCode"):
+                sf_cust_code = record["sfCustCode"]
+                break
+
+        if sf_cust_code and doc.get("custom_salesforce_customer_code") != sf_cust_code:
+            doc.custom_salesforce_customer_code = sf_cust_code
+            doc.save()
+
         frappe.log_error(
             message=f"Payload: {frappe.as_json(payload)}\n\nResponse: {response.text}",
             title=f"Salesforce Sync Success | Customer: {doc.name}",
