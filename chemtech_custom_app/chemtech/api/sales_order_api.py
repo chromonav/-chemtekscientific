@@ -274,7 +274,6 @@ def upsert_sales_order(
 	customer_name=None,
 	company_name=None,
 	contact_name=None,
-	branch_name=None,
 	quote_id=None,
 	opportunity_id=None,
 	payment_terms=None,
@@ -381,8 +380,6 @@ def upsert_sales_order(
 	if contact_person:
 		doc.contact_person = contact_person
 
-	if branch_name:
-		doc.custom_branch = _resolve_link("Branch", branch_name, "branch_name")
 	if payment_terms:
 		doc.payment_terms_template = _resolve_link(
 			"Payment Terms Template", payment_terms, "payment_terms"
