@@ -15,7 +15,6 @@ def _upsert_single_item(item):
         product_name = item.get("product_name")
         product_group = item.get("product_group")
         uom = item.get("uom")
-        warehouse = item.get("warehouse")
         disabled = frappe.utils.cint(item.get("disabled", 0))
         pack = item.get("pack")
         cas_number = item.get("cas_number")
@@ -57,7 +56,6 @@ def _upsert_single_item(item):
         doc.item_group = category or ""
         doc.custom_sub_category = sub_category or ""
         doc.description = product_description or ""
-        doc.custom_warehouse = warehouse or ""
 
         # Disable Salesforce Sync
         doc.flags.ignore_salesforce_sync = True

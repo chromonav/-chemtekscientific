@@ -42,7 +42,6 @@ def _build_product_record(doc):
         # Restricted picklists on Product2: an unset value has to go as null,
         # since "" is not one of the allowed entries.
         "Record_Type__c": doc.get("custom_product_group") or None,
-        "Warehouse__c": doc.get("custom_warehouse") or None,
         "Balance_Qty__c": int(doc.get("custom_balance_quantity") or 0),
         "Raw_Material_Price__c": int(doc.get("custom_raw_material_price") or 0)
     }
