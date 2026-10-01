@@ -15,7 +15,7 @@ def _upsert_single_item(item):
         product_name = item.get("product_name")
         product_group = item.get("product_group")
         uom = item.get("uom")
-        disabled = frappe.utils.cint(item.get("disabled", 0))
+        isactive = 0 if item.get("isactive", True) else 1
         pack = item.get("pack")
         cas_number = item.get("cas_number")
         hsn = item.get("hsn")
@@ -46,7 +46,7 @@ def _upsert_single_item(item):
         doc.item_name = product_name or product_code
         doc.custom_product_group = product_group or "All Item Groups"
         doc.stock_uom = uom or "Nos"
-        doc.disabled = disabled
+        doc.disabled = isactive
 
         # Custom Fields
         doc.gst_hsn_code = hsn or ""
