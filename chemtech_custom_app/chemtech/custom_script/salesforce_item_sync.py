@@ -1,5 +1,9 @@
+import re
+from html import unescape
+
 import frappe
 import requests
+from frappe.utils import strip_html
 
 
 def _get_gst_rate(doc):
@@ -24,10 +28,20 @@ def _get_gst_rate(doc):
     return int(rate) if rate.is_integer() else rate
 
 
+def _plain_text(html_value):
+    """Item descriptions are stored as HTML (text editor); Salesforce wants plain text."""
+    if not html_value:
+        return ""
+    # Block-level boundaries become a space so "</p><p>" does not glue words together.
+    text = re.sub(r"(?i)<br\s*/?>|</(p|div|li|tr|h[1-6])>", " ", html_value)
+    text = strip_html(text)
+    return " ".join(unescape(text).split())
+
+
 def _build_product_record(doc):
     return {
         "Name": doc.item_name,
-        "Description": doc.description or "",
+        "Description": _plain_text(doc.description),
         "ProductCode": doc.name,
         "IsActive": not bool(doc.disabled),
         "UOM__c": doc.stock_uom or "",
