@@ -192,6 +192,7 @@ doctype_js = {"Supplier" : "public/supplier.js",
               "Batch":"public/batch.js",
               "Item":"public/item.js",
               "Customer":"public/customer.js",
+              "Price List":"public/price_list.js",
               }
 
 # doctype_list_js = {"Supplier" : "public/supplier_list.js"}
