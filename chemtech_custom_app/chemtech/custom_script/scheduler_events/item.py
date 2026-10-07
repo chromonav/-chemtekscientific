@@ -6,10 +6,18 @@ from chemtech_custom_app.chemtech.custom_script.salesforce_item_sync import (
 
 
 def _get_target_items():
-    """Non-disabled Items tracked for balance quantity."""
+    """Non-disabled Items tracked for balance quantity.
+
+    Items without a product group, or in the NPD group, are never sent to
+    Salesforce (Record_Type__c would arrive null), so they are excluded here.
+    """
     return frappe.get_all(
         "Item",
-        filters={"disabled": 0},
+        filters=[
+            ["disabled", "=", 0],
+            ["custom_product_group", "is", "set"],
+            ["custom_product_group", "!=", "NPD"],
+        ],
         fields=["name", "custom_balance_quantity"],
     )
 
@@ -30,13 +38,16 @@ def update_balance_quantity():
     company warehouses), push changes to Salesforce.
 
     Only items whose quantity actually moved are written and synced, so a quiet
-    hour costs one query and no API calls.
+    hour costs one query and no API calls. Items with any mandatory field
+    missing are skipped untouched, so their quantity is picked up on the first
+    run after they are completed.
     """
     items = _get_target_items()
     qty_map = _get_actual_qty_map()
 
     updated = 0
     failed = 0
+    skipped = 0
 
     for item in items:
         # No Bin rows means nothing has ever been stocked anywhere, which is a
@@ -48,11 +59,12 @@ def update_balance_quantity():
 
         try:
             doc = frappe.get_doc("Item", item.name)
+
+            if doc._get_missing_mandatory_fields():
+                skipped += 1
+                continue
+
             doc.custom_balance_quantity = qty
-            # Most Items are missing unrelated mandatory custom fields
-            # (custom_product_group, custom_sub_category); this job only owns
-            # balance quantity and must not be blocked by that.
-            doc.flags.ignore_mandatory = True
             doc.save()
 
             sync_item_to_salesforce(doc)
@@ -65,4 +77,4 @@ def update_balance_quantity():
                 title=f"Balance Quantity Sync Failed | Item: {item.name}",
             )
 
-    return {"scanned": len(items), "updated": updated, "failed": failed}
+    return {"scanned": len(items), "updated": updated, "failed": failed, "skipped": skipped}
