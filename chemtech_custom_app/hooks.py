@@ -222,7 +222,9 @@ doc_events = {
         "validate": [
             "chemtech_custom_app.chemtech.custom_script.sales_invoice.validate_sales_invoice",
             "chemtech_custom_app.chemtech.custom_script.inter_company.validate_inter_company_transfer",
+            "chemtech_custom_app.chemtech.custom_script.sales_invoice_attachment.update_attachment_status",
         ],
+        "before_update_after_submit": "chemtech_custom_app.chemtech.custom_script.sales_invoice_attachment.update_attachment_status",
         "on_submit": "chemtech_custom_app.chemtech.custom_script.inter_company.make_purchase_invoice_for_internal_customer",
     },
     "Delivery Note": {
