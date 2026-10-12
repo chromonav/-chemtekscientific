@@ -40,7 +40,7 @@ def make_purchase_invoice_for_internal_customer(doc, method=None):
 	but our Purchase Invoice is deliberately left as a draft -- so it must be set
 	here, immediately, or a resubmit/amend would create a second Purchase Invoice.
 	"""
-	if not doc.is_internal_customer or doc.inter_company_invoice_reference:
+	if not doc.is_internal_customer or doc.inter_company_invoice_reference or doc.is_return or doc.return_against:
 		return
 
 	purchase_invoice = make_inter_company_purchase_invoice(doc.name)
