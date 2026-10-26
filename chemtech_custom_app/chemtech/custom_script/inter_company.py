@@ -70,18 +70,17 @@ def make_purchase_invoice_for_internal_customer(doc, method=None):
 	)
 
 
-def _apply_prefix_rule(purchase_invoice):
-	"""Server-side port of the 'Purchase Invoice Prefix Code' client script.
+def resolve_prefix(doc):
+	"""Server-side port of the 'Prefix Code' client scripts.
 
 	The Prefix Rule lookup normally runs in the browser (onload / field change),
-	which never happens for a Purchase Invoice built in Python. Without it, the
-	mapped document keeps the Sales Invoice's custom_prefix and falls back to the
-	default PINV-.YY.- series. Resolve the matching Prefix Rule for the PI's own
-	company and set custom_prefix + naming_series exactly as the form would.
+	which never happens for a document built in Python. Find the active Prefix Rule
+	of doc's doctype whose conditions all match (most conditions wins) and return
+	its expanded prefix.
 	"""
 	rules = frappe.get_all(
 		"Prefix Rule",
-		filters={"document_type": "Purchase Invoice", "disabled": 0},
+		filters={"document_type": doc.doctype, "disabled": 0},
 		fields=["name", "prefix"],
 	)
 
@@ -92,24 +91,31 @@ def _apply_prefix_rule(purchase_invoice):
 			filters={"parent": rule.name, "parenttype": "Prefix Rule"},
 			fields=["field", "value"],
 		)
-		if all(str(purchase_invoice.get(c.field)) == str(c.value) for c in conditions):
+		if all(str(doc.get(c.field)) == str(c.value) for c in conditions):
 			matches.append((len(conditions), rule))
 
 	if not matches:
 		frappe.throw(
-			f"No Prefix Rule matches the auto-created Purchase Invoice for company "
-			f"{purchase_invoice.company}. Add a Prefix Rule for Purchase Invoice."
+			f"No Prefix Rule matches this {doc.doctype} for company "
+			f"{doc.company}. Add a Prefix Rule for {doc.doctype}."
 		)
 
 	top = max(count for count, _ in matches)
 	winners = [rule for count, rule in matches if count == top]
 	if len(winners) > 1:
 		frappe.throw(
-			"Multiple Prefix Rules match the auto-created Purchase Invoice with the same "
+			f"Multiple Prefix Rules match this {doc.doctype} with the same "
 			"specificity: " + ", ".join(rule.name for rule in winners)
 		)
 
-	prefix = _expand_prefix(winners[0].prefix, purchase_invoice)
+	return _expand_prefix(winners[0].prefix, doc)
+
+
+def _apply_prefix_rule(purchase_invoice):
+	"""Set custom_prefix + naming_series on the auto-created Purchase Invoice,
+	exactly as the form would. Without it the mapped document keeps the Sales
+	Invoice's custom_prefix and falls back to the default PINV-.YY.- series."""
+	prefix = resolve_prefix(purchase_invoice)
 	purchase_invoice.custom_prefix = prefix
 	purchase_invoice.naming_series = prefix
 

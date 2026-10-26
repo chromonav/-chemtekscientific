@@ -3,6 +3,8 @@ import json
 import frappe
 from frappe.utils import flt, getdate, nowdate
 
+from chemtech_custom_app.chemtech.custom_script.inter_company import resolve_prefix
+
 
 def _as_list(value):
 	"""Accept a list, a JSON string, or a single dict and return a list of dicts."""
@@ -407,6 +409,11 @@ def upsert_sales_order(
 		doc.custom_description = description
 
 	_set_taxes(doc)
+
+	if doc.is_new():
+		# The form fills custom_prefix in the browser; the Sales Order series
+		# (.{custom_prefix}.{so}.) reads it, so an API insert would otherwise get a bare number.
+		doc.custom_prefix = resolve_prefix(doc)
 
 	if items or doc.is_new():
 		_set_items(doc, items)
