@@ -196,7 +196,7 @@ doctype_js = {"Supplier" : "public/supplier.js",
               "Payment Entry":"public/payment_entry.js",
               }
 
-# doctype_list_js = {"Supplier" : "public/supplier_list.js"}
+doctype_list_js = {"Item": "public/item_list.js"}
 
 # Fixtures
 # --------
