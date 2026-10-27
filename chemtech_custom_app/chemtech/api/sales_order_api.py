@@ -216,13 +216,29 @@ def _find_sales_order(name=None, custom_sales_order_salesforce_=None):
 	return None
 
 
+def _resolve_price_list(price_list):
+	"""A Selling Price List by name. Validated up front so the error names the field."""
+	if not price_list:
+		return None
+	row = frappe.db.get_value("Price List", price_list, ["enabled", "selling"], as_dict=True)
+	if not row:
+		frappe.throw(f"price_list {price_list!r} does not exist as a Price List.")
+	if not row.enabled:
+		frappe.throw(f"price_list {price_list!r} is disabled.")
+	if not row.selling:
+		frappe.throw(f"price_list {price_list!r} is not a Selling Price List.")
+	return price_list
+
+
 def _set_items(doc, items):
 	"""
-	Replace the items table from {"item_code", "qty", "rate", "discount_percentage"}.
-	ERPNext fetches item_name, uom, hsn, item_tax_template and taxes on validate.
+	Replace the items table from {"item_code", "qty", "rate"}.
+	ERPNext fetches item_name, uom, hsn, item_tax_template, taxes and the
+	price_list_rate (from the order's selling price list) on validate.
 
-	When a discount is sent, the price given is treated as the list price and `rate`
-	is left blank so ERPNext computes the discounted rate itself.
+	`rate` is the final, already-discounted selling price from Salesforce. The
+	discount is not sent: _apply_price_list_discount derives it afterwards from the
+	price list rate. If `rate` is omitted the price list rate is used as is.
 	"""
 	if not items:
 		frappe.throw("At least one item is required.")
@@ -247,26 +263,37 @@ def _set_items(doc, items):
 
 		rate = row.get("rate")
 		price_list_rate = row.get("price_list_rate")
-		discount = flt(row.get("discount_percentage"))
-
-		if discount < 0 or discount > 100:
-			frappe.throw(f"discount_percentage must be between 0 and 100 for item {item_code}.")
-
-		if discount:
-			# ERPNext derives rate = price_list_rate x (1 - discount%), and only does so
-			# while `rate` is still blank (see erpnext/controllers/taxes_and_totals.py).
-			# So the price we are given is the list price, and rate is left for ERPNext.
-			list_price = price_list_rate if price_list_rate not in (None, "") else rate
-			if list_price not in (None, ""):
-				line["price_list_rate"] = flt(list_price)
-			line["discount_percentage"] = discount
-		else:
-			if price_list_rate not in (None, ""):
-				line["price_list_rate"] = flt(price_list_rate)
-			if rate not in (None, ""):
-				line["rate"] = flt(rate)
+		if price_list_rate not in (None, ""):
+			line["price_list_rate"] = flt(price_list_rate)
+		if rate not in (None, ""):
+			if flt(rate) < 0:
+				frappe.throw(f"rate cannot be negative for item {item_code}.")
+			line["rate"] = flt(rate)
 
 		doc.append("items", line)
+
+
+def _apply_price_list_discount(doc):
+	"""
+	Derive discount_percentage / discount_amount from price list rate vs. rate.
+
+	Salesforce sends the discounted rate. ERPNext only computes a discount from a
+	discount percentage, and only the browser form works backwards from a typed
+	rate, so do that here: fetch the price list rates, then for every row whose
+	rate is below its price list rate record the difference as the discount. A rate
+	above the price list rate is left for ERPNext to treat as a margin.
+	"""
+	doc.set_missing_values()
+
+	for row in doc.items:
+		plr = flt(row.price_list_rate)
+		rate = flt(row.rate)
+		if plr > 0 and 0 < rate < plr:
+			row.discount_amount = flt(plr - rate, row.precision("discount_amount"))
+			row.discount_percentage = flt((1 - rate / plr) * 100.0, row.precision("discount_percentage"))
+		else:
+			row.discount_percentage = 0
+			row.discount_amount = 0
 
 
 @frappe.whitelist(methods=["POST"])
@@ -289,6 +316,7 @@ def upsert_sales_order(
 	description=None,
 	sales_person=None,
 	set_warehouse=None,
+	price_list=None,
 	items=None,
 ):
 	"""
@@ -311,8 +339,12 @@ def upsert_sales_order(
 	rows: ERPNext only expands a template into tax rows in the browser form, so a
 	server-side call produces no tax unless we expand it here.
 
-	`items` is a list of {"item_code", "qty", "rate", "discount_percentage"}. Item
-	name, UOM, HSN, item tax template and all totals are left to ERPNext.
+	`price_list` is a Selling Price List name. When omitted ERPNext uses the
+	customer's default price list, then the Selling Settings one.
+
+	`items` is a list of {"item_code", "qty", "rate"}. `rate` is the discounted
+	price from Salesforce; the discount percentage is worked out from the price list
+	rate. Item name, UOM, HSN, item tax template and all totals are left to ERPNext.
 
 	Returns the document name.
 	"""
@@ -391,6 +423,15 @@ def upsert_sales_order(
 	if set_warehouse:
 		doc.set_warehouse = _resolve_link("Warehouse", set_warehouse, "set_warehouse")
 
+	if price_list:
+		price_list = _resolve_price_list(price_list)
+		if not doc.is_new() and doc.selling_price_list != price_list and not items:
+			frappe.throw(
+				"price_list changed on an existing Sales Order - send items as well so "
+				"they are re-priced from the new price list."
+			)
+		doc.selling_price_list = price_list
+
 	if opportunity_id:
 		doc.custom_opportunity_salesforce = opportunity_id
 	if quote_id:
@@ -417,6 +458,7 @@ def upsert_sales_order(
 
 	if items or doc.is_new():
 		_set_items(doc, items)
+		_apply_price_list_discount(doc)
 
 	doc.flags.ignore_salesforce_sync = True
 	was_new = doc.is_new()
