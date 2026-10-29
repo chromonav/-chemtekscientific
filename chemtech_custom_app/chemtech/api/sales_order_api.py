@@ -57,21 +57,29 @@ def _resolve_company(company_name=None, current=None):
 
 def _resolve_contact(contact_name=None, customer=None):
 	"""
-	Contact ids in ERPNext are "<full name>-<linked party>", so a contact called
-	Suraj on customer ABC is the Contact "Suraj-ABC". Build that id from the
-	incoming contact_name and the resolved customer.
+	`contact_name` carries the ERPNext Contact id (its docname) and is used as
+	sent. It must exist and be linked to the order's customer.
 	"""
-	if not contact_name:
+	contact = (contact_name or "").strip()
+	if not contact:
 		return None
 
-	contact_id = f"{contact_name}-{customer}"
-	if frappe.db.exists("Contact", contact_id):
-		return contact_id
+	if not frappe.db.exists("Contact", contact):
+		frappe.throw(f"Contact {contact!r} does not exist.")
 
-	frappe.throw(
-		f"Contact {contact_id!r} does not exist. Create the Contact against customer "
-		f"{customer!r} first, or send an existing Contact id as contact_name."
+	linked = frappe.db.exists(
+		"Dynamic Link",
+		{
+			"parenttype": "Contact",
+			"parent": contact,
+			"link_doctype": "Customer",
+			"link_name": customer,
+		},
 	)
+	if not linked:
+		frappe.throw(f"Contact {contact!r} is not linked to customer {customer!r}.")
+
+	return contact
 
 
 def _resolve_link(doctype, value, label):
@@ -329,8 +337,8 @@ def upsert_sales_order(
 	`customer_name` and `company_name` are the business keys - the Customer and
 	Company are looked up by name, not by account code or abbreviation.
 
-	`contact_name` is the person's name; the Contact id is built as
-	"<contact_name>-<customer>" the way ERPNext names Contacts.
+	`contact_name` is the ERPNext Contact id (e.g. "Asha Patel-ABC Traders"). It is
+	used as sent and must be linked to the order's customer.
 
 	`order_start_date` maps to the Sales Order date. `delivery_date` falls back to it
 	when omitted, since ERPNext requires one.
