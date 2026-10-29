@@ -234,6 +234,9 @@ doc_events = {
     "Customer": {
         "validate": "chemtech_custom_app.chemtech.custom_script.customer.set_account_code"
     },
+    "Contact": {
+        "before_insert": "chemtech_custom_app.chemtech.custom_script.contact.validate_unique_contact"
+    },
 }
 
 
