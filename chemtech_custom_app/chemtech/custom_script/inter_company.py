@@ -7,12 +7,18 @@ from erpnext.accounts.party import get_party_account
 from frappe.utils import getdate
 
 
+def _auto_purchase_invoice_enabled():
+	"""Selling Settings > 'Auto Create Purchase Invoice' switch (custom field,
+	exported in chemtech/custom/selling_settings.json)."""
+	return bool(frappe.db.get_single_value("Selling Settings", "custom_auto_create_purchase_invoice"))
+
+
 def validate_inter_company_transfer(doc, method=None):
 	"""Block submit of a Sales Invoice to an internal customer when no Supplier is
 	set up to represent this company -- the auto Purchase Invoice on submit would
 	otherwise fail with the same error, after the invoice is already submitted.
 	"""
-	if not doc.is_internal_customer:
+	if not doc.is_internal_customer or not _auto_purchase_invoice_enabled():
 		return
 
 	supplier = frappe.db.get_value(
@@ -40,6 +46,9 @@ def make_purchase_invoice_for_internal_customer(doc, method=None):
 	but our Purchase Invoice is deliberately left as a draft -- so it must be set
 	here, immediately, or a resubmit/amend would create a second Purchase Invoice.
 	"""
+	if not _auto_purchase_invoice_enabled():
+		return
+
 	if not doc.is_internal_customer or doc.inter_company_invoice_reference or doc.is_return or doc.return_against:
 		return
 
