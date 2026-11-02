@@ -34,6 +34,16 @@ def validate_inter_company_transfer(doc, method=None):
 			f"'Represents Company' set to {doc.company} before submitting this invoice."
 		)
 
+	if doc.is_return or doc.return_against or doc.inter_company_invoice_reference:
+		return
+
+	# Block at validate, before submit, so the Sales Invoice is never submitted
+	# without its Purchase Invoice because an item lacks the buyer's tax template.
+	_counterpart_item_tax_templates(
+		[(row.idx, row.item_code, row.item_tax_template) for row in doc.items],
+		frappe.db.get_value("Customer", doc.customer, "represents_company"),
+	)
+
 
 def make_purchase_invoice_for_internal_customer(doc, method=None):
 	"""On submit of a Sales Invoice billed to an internal customer, auto-create the
@@ -65,7 +75,16 @@ def make_purchase_invoice_for_internal_customer(doc, method=None):
 	purchase_invoice.custom_purchase_type= "Operational Purchase"
 	_apply_prefix_rule(purchase_invoice)
 
+	expected_templates = [item.item_tax_template for item in purchase_invoice.items]
 	purchase_invoice.insert(ignore_permissions=True)
+	# insert() runs ERPNext's own template validation, which may swap a template.
+	# Never submit at a rate other than the one mirrored from the Sales Invoice.
+	if expected_templates != [item.item_tax_template for item in purchase_invoice.items]:
+		frappe.throw(
+			"ERPNext changed the Item Tax Template while saving the Purchase Invoice "
+			f"for {purchase_invoice.company}; refusing to submit at a different rate. "
+			"Check the Item Taxes table of the items."
+		)
 	purchase_invoice.submit()
 
 	frappe.db.set_value(
@@ -218,19 +237,18 @@ def _reset_taxes_for_company(purchase_invoice):
 		frappe.db.get_value("Sales Invoice Item", item.sales_invoice_item, "item_tax_template")
 		for item in purchase_invoice.items
 	]
+	# Fail before anything is created if an item has no template for this company.
+	templates = _counterpart_item_tax_templates(
+		[(item.idx, item.item_code, source) for item, source in zip(purchase_invoice.items, source_templates)],
+		purchase_invoice.company,
+	)
 
 	for item in purchase_invoice.items:
 		item.item_tax_template = None
 		item.item_tax_rate = "{}"
 	purchase_invoice.set_missing_values()
 
-	# The client does not fill rates in the Item master's Item Taxes table, so
-	# set_missing_values() finds no template for the buying company and the
-	# header tax rate (18%) applies. Mirror the Sales Invoice's template instead.
-	for item, source_template in zip(purchase_invoice.items, source_templates):
-		template = _matching_item_tax_template(
-			source_template, purchase_invoice.company, purchase_invoice, item.item_code
-		)
+	for item, template in zip(purchase_invoice.items, templates):
 		if template:
 			item.item_tax_template = template
 			item.item_tax_rate = get_item_tax_map(purchase_invoice.company, template, as_json=True)
@@ -238,19 +256,45 @@ def _reset_taxes_for_company(purchase_invoice):
 	purchase_invoice.calculate_taxes_and_totals()
 
 
-def _matching_item_tax_template(source_template, company, purchase_invoice, item_code):
-	"""Item Tax Template of `company` equivalent to the Sales Invoice's
-	`source_template`: same GST Treatment and GST Rate (Item Tax Templates are
-	company-scoped, so the template itself can't be reused).
+def _counterpart_item_tax_templates(rows, company):
+	"""Item Tax Template of `company` for each (idx, item_code, source_template) row.
 
-	Several templates can match (e.g. 'GST 18% - X' and 'GST @18 % - X'). ERPNext's
-	validate_item_tax_template swaps in the first template listed in the Item /
-	Item Group "Item Taxes" table when the row's template isn't listed there, which
-	would silently change the rate. So prefer a template the item allows, then one
-	whose title equals the source's, then one that carries the account heads used
-	by the Purchase Invoice's taxes, then name order.
+	Rows whose Sales Invoice line has no template map to None. A line that does
+	have one MUST find a template of `company` with the same GST Treatment and GST
+	Rate in the Item's (or its Item Groups') "Item Taxes" table; otherwise this
+	throws, so no Purchase Invoice is made at a rate the client never configured.
 	"""
-	if not source_template:
+	templates, missing = [], []
+	for idx, item_code, source_template in rows:
+		if not source_template:
+			templates.append(None)
+			continue
+		template = _counterpart_item_tax_template(item_code, source_template, company)
+		if not template:
+			missing.append(f"Row #{idx}: {item_code} ({source_template})")
+		templates.append(template)
+
+	if missing:
+		frappe.throw(
+			f"Cannot create the Purchase Invoice for company <b>{company}</b>: no matching "
+			"Item Tax Template is set in the Item's <b>Item Taxes</b> table (or its Item Group) "
+			"for this company. Add the same GST rate template of this company to the item:<br>"
+			+ "<br>".join(missing),
+			title="Item Tax Template missing",
+		)
+	return templates
+
+
+def _counterpart_item_tax_template(item_code, source_template, company):
+	"""Template of `company` with the same GST Treatment and GST Rate as
+	`source_template` (Item Tax Templates are company-scoped, so the Sales
+	Invoice's own can't be reused) that the Item / Item Groups list in their Item
+	Taxes tables. Restricting to listed templates also keeps ERPNext's
+	validate_item_tax_template from swapping the rate on save. Several may match
+	(e.g. 'GST 18% - X' and 'GST @18 % - X'); prefer the source's title, then name.
+	"""
+	allowed = _allowed_item_tax_templates(item_code)
+	if not allowed:
 		return None
 
 	treatment, rate, title = frappe.db.get_value(
@@ -259,6 +303,7 @@ def _matching_item_tax_template(source_template, company, purchase_invoice, item
 	candidates = frappe.get_all(
 		"Item Tax Template",
 		filters={
+			"name": ["in", list(allowed)],
 			"company": company,
 			"disabled": 0,
 			"gst_treatment": treatment,
@@ -270,27 +315,11 @@ def _matching_item_tax_template(source_template, company, purchase_invoice, item
 	if not candidates:
 		return None
 
-	allowed = _allowed_item_tax_templates(item_code)
-	tax_accounts = {row.account_head for row in purchase_invoice.get("taxes") or [] if row.account_head}
-
-	def rank(candidate):
-		heads = set(
-			frappe.get_all(
-				"Item Tax Template Detail", filters={"parent": candidate.name}, pluck="tax_type"
-			)
-		)
-		return (
-			bool(allowed) and candidate.name not in allowed,
-			candidate.title != title,
-			not (tax_accounts & heads),
-		)
-
-	return min(candidates, key=rank).name
+	return min(candidates, key=lambda candidate: candidate.title != title).name
 
 
 def _allowed_item_tax_templates(item_code):
-	"""Templates listed in the Item's and its Item Groups' Item Taxes tables --
-	the set validate_item_tax_template accepts. Empty means no restriction."""
+	"""Templates listed in the Item's and its Item Groups' Item Taxes tables."""
 	item = frappe.get_cached_doc("Item", item_code)
 	allowed = {row.item_tax_template for row in item.taxes or []}
 	group = item.item_group
