@@ -82,6 +82,58 @@ def _resolve_contact(contact_name=None, customer=None):
 	return contact
 
 
+def _resolve_company_contact(contact_name=None, company=None):
+	"""ERPNext Contact id linked to the order's Company, or None when omitted."""
+	contact = (contact_name or "").strip()
+	if not contact:
+		return None
+
+	if not frappe.db.exists("Contact", contact):
+		frappe.throw(f"company_contact_person {contact!r} does not exist as a Contact.")
+
+	linked = frappe.db.exists(
+		"Dynamic Link",
+		{
+			"parenttype": "Contact",
+			"parent": contact,
+			"link_doctype": "Company",
+			"link_name": company,
+		},
+	)
+	if not linked:
+		frappe.throw(
+			f"company_contact_person {contact!r} is not linked to company {company!r}."
+		)
+
+	return contact
+
+
+def _resolve_address(address=None, link_doctype=None, link_name=None, label="address"):
+	"""ERPNext Address id linked to Customer/Company, or None when omitted."""
+	address = (address or "").strip()
+	if not address:
+		return None
+
+	if not frappe.db.exists("Address", address):
+		frappe.throw(f"{label} {address!r} does not exist as an Address.")
+
+	linked = frappe.db.exists(
+		"Dynamic Link",
+		{
+			"parenttype": "Address",
+			"parent": address,
+			"link_doctype": link_doctype,
+			"link_name": link_name,
+		},
+	)
+	if not linked:
+		frappe.throw(
+			f"{label} {address!r} is not linked to {link_doctype} {link_name!r}."
+		)
+
+	return address
+
+
 def _resolve_link(doctype, value, label):
 	"""Validate a Link value up front so the error names the field, not the field id."""
 	if not value:
@@ -149,12 +201,14 @@ def _derive_taxes(doc):
 		party_type="Customer",
 		company=doc.company,
 		doctype="Sales Order",
-		posting_date=doc.transaction_date
+		posting_date=doc.transaction_date,
+		party_address=doc.customer_address,
+		company_address=doc.company_address,
+		shipping_address=doc.shipping_address_name,
 	) or {}
 
-	if not doc.customer_address and party.get("customer_address"):
-		doc.customer_address = party.get("customer_address")
-
+	# Billing address comes from the payload (`customer_billing_address`). Do not
+	# pick a default among multiple Customer addresses here.
 	# 1. India Compliance, state aware
 	gst = _get_gst_details(doc, party)
 	if gst.get("place_of_supply"):
@@ -186,6 +240,7 @@ def _get_gst_details(doc, party):
 		return {}
 
 	address = doc.customer_address or party.get("customer_address")
+	company_address = doc.company_address or party.get("company_address")
 
 	return (
 		get_gst_details(
@@ -194,7 +249,7 @@ def _get_gst_details(doc, party):
 				"customer_address": address,
 				"party_address": address,
 				"company_gstin": party.get("company_gstin"),
-				"company_address": party.get("company_address"),
+				"company_address": company_address,
 				"billing_address_gstin": party.get("billing_address_gstin"),
 				"gst_category": party.get("gst_category"),
 			},
@@ -266,8 +321,6 @@ def _set_items(doc, items):
 		line = {"item_code": item_code, "qty": qty}
 		if row.get("delivery_date"):
 			line["delivery_date"] = getdate(row.get("delivery_date"))
-		if row.get("warehouse"):
-			line["warehouse"] = row.get("warehouse")
 
 		rate = row.get("rate")
 		price_list_rate = row.get("price_list_rate")
@@ -311,6 +364,11 @@ def upsert_sales_order(
 	customer_name=None,
 	company_name=None,
 	contact_name=None,
+	customer_billing_address=None,
+	customer_shipping_address=None,
+	company_address=None,
+	company_dispatch_address=None,
+	company_contact_person=None,
 	quote_id=None,
 	opportunity_id=None,
 	payment_terms=None,
@@ -330,6 +388,33 @@ def upsert_sales_order(
 	"""
 	Create or update a draft Sales Order from a Salesforce Order payload.
 
+	Mandatory:
+	- `custom_sales_order_salesforce_` (or `name` when updating an existing draft)
+	- `customer_name` on create
+	- `customer_billing_address` on create (and whenever the order has no billing
+	  address yet) — ERPNext Address id linked to the Customer; maps to
+	  `customer_address`
+	- `items` on create (list of {"item_code", "qty", "rate"}; no per-line warehouse)
+
+	Optional:
+	- `company_name` — defaults to the user/site default Company
+	- `contact_name` — Customer Contact id → `contact_person`
+	- `customer_shipping_address` — Customer Address id → `shipping_address_name`
+	  (if omitted on create, ERPNext may fill a party default shipping address)
+	- `company_address` — Company Address id → `company_address`
+	  (if omitted on create, ERPNext may fill the company default address)
+	- `company_dispatch_address` — Company Address id → `dispatch_address_name`
+	  (not auto-filled; send when needed)
+	- `company_contact_person` — Company Contact id → `company_contact_person`
+	- `set_warehouse` — parent Source Warehouse; ERPNext copies it onto item rows
+	- `quote_id`, `opportunity_id`, `order_start_date`,
+	  `delivery_date`, `activation_date`, `activated_by`, `stock_delivery`,
+	  `validity`, `availability`, `description`, `sales_person`, `price_list`
+
+	Also mandatory on this site (Property Setters):
+	- `payment_terms` — Payment Terms Template name → `payment_terms_template`
+	  (`taxes_and_charges` is derived server-side when omitted)
+
 	`custom_sales_order_salesforce_` is the Salesforce Order key and is what makes
 	this call idempotent: the first call creates the Sales Order and stores the key
 	on it, every later call with the same key updates that same document.
@@ -337,15 +422,12 @@ def upsert_sales_order(
 	`customer_name` and `company_name` are the business keys - the Customer and
 	Company are looked up by name, not by account code or abbreviation.
 
-	`contact_name` is the ERPNext Contact id (e.g. "Asha Patel-ABC Traders"). It is
-	used as sent and must be linked to the order's customer.
+	Address and contact fields are ERPNext document ids. Because a party can have
+	many addresses, these are taken from the payload instead of auto-picking a
+	default. Each address/contact must be linked to the order's Customer or Company.
 
 	`order_start_date` maps to the Sales Order date. `delivery_date` falls back to it
 	when omitted, since ERPNext requires one.
-
-	`taxes_and_charges` is a Sales Taxes and Charges Template name. Pass it to get GST
-	rows: ERPNext only expands a template into tax rows in the browser form, so a
-	server-side call produces no tax unless we expand it here.
 
 	`price_list` is a Selling Price List name. When omitted ERPNext uses the
 	customer's default price list, then the Selling Settings one.
@@ -354,7 +436,7 @@ def upsert_sales_order(
 	price from Salesforce; the discount percentage is worked out from the price list
 	rate. Item name, UOM, HSN, item tax template and all totals are left to ERPNext.
 
-	Returns the document name.
+	Returns the document name and totals.
 	"""
 	if not (custom_sales_order_salesforce_ or name):
 		frappe.throw("custom_sales_order_salesforce_ is required.")
@@ -405,6 +487,8 @@ def upsert_sales_order(
 			"company_address_display",
 			"company_gstin",
 			"company_contact_person",
+			"dispatch_address_name",
+			"dispatch_address",
 			"set_warehouse",
 			"taxes_and_charges",
 			"cost_center",
@@ -418,9 +502,41 @@ def upsert_sales_order(
 	# ERPNext makes delivery_date mandatory on a Sales order - fall back to the order date.
 	doc.delivery_date = getdate(delivery_date or doc.delivery_date or doc.transaction_date)
 
+	# Address / contact ids from the payload. Partial updates keep the previous
+	# value when a field is omitted; a create must send customer_billing_address.
+	billing = _resolve_address(
+		customer_billing_address, "Customer", doc.customer, "customer_billing_address"
+	)
+	if billing:
+		doc.customer_address = billing
+	elif not doc.customer_address:
+		frappe.throw("customer_billing_address is required.")
+
+	shipping = _resolve_address(
+		customer_shipping_address, "Customer", doc.customer, "customer_shipping_address"
+	)
+	if shipping:
+		doc.shipping_address_name = shipping
+
+	company_addr = _resolve_address(
+		company_address, "Company", doc.company, "company_address"
+	)
+	if company_addr:
+		doc.company_address = company_addr
+
+	dispatch = _resolve_address(
+		company_dispatch_address, "Company", doc.company, "company_dispatch_address"
+	)
+	if dispatch:
+		doc.dispatch_address_name = dispatch
+
 	contact_person = _resolve_contact(contact_name, doc.customer)
 	if contact_person:
 		doc.contact_person = contact_person
+
+	company_contact = _resolve_company_contact(company_contact_person, doc.company)
+	if company_contact:
+		doc.company_contact_person = company_contact
 
 	if payment_terms:
 		doc.payment_terms_template = _resolve_link(
@@ -486,6 +602,12 @@ def upsert_sales_order(
 		"custom_sales_order_salesforce_": doc.get("custom_sales_order_salesforce_"),
 		"customer": doc.customer,
 		"company": doc.company,
+		"customer_address": doc.customer_address,
+		"shipping_address_name": doc.shipping_address_name,
+		"company_address": doc.company_address,
+		"dispatch_address_name": doc.dispatch_address_name,
+		"contact_person": doc.contact_person,
+		"company_contact_person": doc.company_contact_person,
 		"docstatus": doc.docstatus,
 		"status": doc.status,
 		"taxes_and_charges": doc.taxes_and_charges,
